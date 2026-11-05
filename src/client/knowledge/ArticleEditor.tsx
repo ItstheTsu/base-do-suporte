@@ -10,6 +10,7 @@ import { ApiError, errorMessage, request } from "./api";
 import { useSupport } from "./session-context";
 import ArticleContent from "./ArticleContent";
 import ProcedureEditor from "./ProcedureEditor";
+import Icon from "./Icon";
 import type { Article, ArticleDocument } from "./types";
 
 const blank: ArticleDocument = {
@@ -27,6 +28,10 @@ const blank: ArticleDocument = {
   warnings: [],
   sources: [{ title: "", url: "" }],
   status: "draft",
+  databaseMode: "none",
+  requiresEscalation: false,
+  errorMessage: "",
+  procedureSections: [{ id: "principal", title: "Procedimento", steps: [""], images: [] }],
 };
 const slugify = (value: string) =>
   value
@@ -89,7 +94,7 @@ export default function ArticleEditor() {
           deletedAt: _deleted,
           ...content
         } = article;
-        setDocument({...content,databaseMode:content.databaseMode || (content.requiresDatabaseChange?"write":"none"),requiresEscalation:content.requiresEscalation ?? Boolean(content.requiresDatabaseChange)});
+        setDocument({...content,procedureSections:content.procedureSections?.length?content.procedureSections:[{id:"principal",title:"Procedimento",steps:content.steps,images:[]}],databaseMode:content.databaseMode || (content.requiresDatabaseChange?"write":"none"),requiresEscalation:content.requiresEscalation ?? Boolean(content.requiresDatabaseChange)});
         setArticleId(article.id);
         setVersion(revision);
         setTags(content.tags.join(", "));
@@ -200,26 +205,25 @@ export default function ArticleEditor() {
   return (
     <div className="kb-container kb-editor">
       <Link className="kb-back" to={adminMode ? "/admin" : "/"}>
-        {adminMode ? "← Gestão de artigos" : "← Base do Suporte"}
+        <Icon name="back" size={16} /> {adminMode ? "Gestão de artigos" : "Base do Suporte"}
       </Link>
       <div className="kb-page-heading">
         <div>
           <div className="kb-eyebrow">CONTEÚDO DO SUPORTE</div>
           <h1>{editing ? "Editar artigo" : "Novo artigo"}</h1>
           <p>
-            Uma mensagem clara, um procedimento reproduzível e uma forma de
-            validar.
+            Preencha o contexto, os passos e a forma de conferir o resultado.
           </p>
         </div>
-        <span className={`kb-status ${document.status}`}>
-          {document.status === "published" ? "Publicado" : "Rascunho"}
+        <span className={`kb-status ${editing ? document.status : "unpublished"}`}>
+          {!editing ? "Não publicado" : document.status === "published" ? "Publicado" : "Rascunho"}
         </span>
       </div>
-      <form onSubmit={save}>
+      <form onSubmit={save} onInvalidCapture={event => { const target = event.target as HTMLInputElement; const details = target.closest("details"); if (details) details.open = true; }}>
         <fieldset disabled={saving || uploading}>
           <legend className="kb-sr">Conteúdo do artigo</legend>
           <section className="kb-editor-section">
-            <h2>Identificação</h2>
+            <h2>1. Informações do artigo</h2>
             <label className="kb-field">
               <span>Título</span>
               <input
@@ -233,6 +237,7 @@ export default function ArticleEditor() {
                 }}
               />
             </label>
+            <details className="kb-disclosure"><summary>Personalizar endereço do artigo</summary>
             <label className="kb-field">
               <span>Endereço do artigo</span>
               <input
@@ -249,6 +254,7 @@ export default function ArticleEditor() {
                 {editing ? " · Endereço permanente." : ""}
               </small>
             </label>
+            </details>
             <label className="kb-field">
               <span>Resumo</span>
               <textarea
@@ -295,9 +301,7 @@ export default function ArticleEditor() {
             </label>
           </section>
           <section className="kb-editor-section">
-            <h2>Procedimento</h2>
-            <label className="kb-field"><span>Atuação no banco de dados</span><select value={document.databaseMode || (document.requiresDatabaseChange?"write":"none")} onChange={e=>{const mode=e.target.value as "none"|"read"|"write";field("databaseMode",mode);field("requiresDatabaseChange",mode==="write");if(mode==="write")field("requiresEscalation",true);}}><option value="none">Sem atuação direta no banco</option><option value="read">Consulta ao banco</option><option value="write">Alteração direta no banco</option></select></label>
-            <label className="kb-database-check"><input type="checkbox" checked={document.requiresEscalation??Boolean(document.requiresDatabaseChange)} onChange={e=>field("requiresEscalation",e.target.checked)}/><span>Exige auxílio/escalonamento para N2 ou Supervisor.</span></label>
+            <h2>2. Contexto</h2>
             <label className="kb-field"><span>Mensagem de erro</span><textarea rows={3} maxLength={5000} value={document.errorMessage||""} onChange={e=>field("errorMessage",e.target.value)}/></label>
             {(
               [
@@ -317,19 +321,10 @@ export default function ArticleEditor() {
                 />
               </label>
             ))}
-            {!document.procedureSections?.length && (<label className="kb-field">
-              <span>Passos do procedimento</span>
-              <textarea
-                required
-                maxLength={30000}
-                rows={7}
-                value={document.steps.join("\n")}
-                onChange={(e) => field("steps", e.target.value.split("\n"))}
-              />
-              <small>
-                Um passo por linha. Até 30 passos com 2.000 caracteres cada.
-              </small>
-            </label>)}
+          </section>
+          <ProcedureEditor value={document.procedureSections||[]} steps={document.steps} onBusy={setUploading} onPreview={(id,url)=>setImageSources(old=>({...old,[id]:url}))} onChange={value=>field("procedureSections",value)}/>
+          <section className="kb-editor-section">
+            <h2>4. Validação e cuidados</h2>
             <label className="kb-field">
               <span>Como validar</span>
               <textarea
@@ -341,6 +336,10 @@ export default function ArticleEditor() {
                 onChange={(e) => field("validation", e.target.value)}
               />
             </label>
+            <details className="kb-disclosure" open={Boolean(document.requiresEscalation || document.warnings.length || (document.databaseMode && document.databaseMode !== "none")) || undefined}>
+              <summary>Cuidados, escalonamento e acesso ao banco</summary>
+            <label className="kb-field"><span>Atuação no banco de dados</span><select value={document.databaseMode || (document.requiresDatabaseChange?"write":"none")} onChange={e=>{const mode=e.target.value as "none"|"read"|"write";field("databaseMode",mode);field("requiresDatabaseChange",mode==="write");if(mode==="write")field("requiresEscalation",true);}}><option value="none">Sem atuação direta no banco</option><option value="read">Consulta ao banco</option><option value="write">Alteração direta no banco</option></select></label>
+            <label className="kb-database-check"><input type="checkbox" checked={document.requiresEscalation??Boolean(document.requiresDatabaseChange)} onChange={e=>field("requiresEscalation",e.target.checked)}/><span>Exige auxílio/escalonamento para N2 ou Supervisor.</span></label>
             <label className="kb-field">
               <span>Cuidados e limites de aplicação</span>
               <textarea
@@ -354,9 +353,10 @@ export default function ArticleEditor() {
                 credenciais.
               </small>
             </label>
+            </details>
           </section>
           <section className="kb-editor-section">
-            <h2>Fontes</h2>
+            <h2>5. Referências</h2>
             <p>
               Use endereços públicos, sem senha ou token. Ao menos uma fonte é
               obrigatória.
@@ -427,7 +427,6 @@ export default function ArticleEditor() {
               + Adicionar fonte
             </button>
           </section>
-      <ProcedureEditor value={document.procedureSections||[]} steps={document.steps} onBusy={setUploading} onPreview={(id,url)=>setImageSources(old=>({...old,[id]:url}))} onChange={value=>field("procedureSections",value)}/>
         </fieldset>
         {error && (
           <div role="alert" className="kb-error">
@@ -445,7 +444,7 @@ export default function ArticleEditor() {
         )}
         {notice && (
           <p className="kb-notice" role="status">
-            {notice}
+            {notice}{document.status === "published" && <Link to={`/artigos/${document.slug}`}>Ver artigo</Link>}
           </p>
         )}
         <div className="kb-editor-actions">
@@ -475,7 +474,7 @@ export default function ArticleEditor() {
             >
               {saving
                 ? "Salvando…"
-                : document.status === "published"
+                : editing && document.status === "published"
                   ? "Salvar publicação"
                   : "Publicar artigo"}
             </button>

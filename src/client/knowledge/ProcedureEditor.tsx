@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import type { ClipboardEvent } from "react";
 import { errorMessage } from "./api";
+import Icon from "./Icon";
 import type { ArticleImage, ProcedureSection } from "./types";
 
 interface Upload extends ArticleImage { previewUrl: string }
@@ -24,14 +25,17 @@ export default function ProcedureEditor({value,steps,onChange,onBusy,onPreview}:
  const [busy,setBusy]=useState(false),[error,setError]=useState("");
  const [previews,setPreviews]=useState<Record<string,string>>({});
  const current=useRef(value);current.current=value;
- function update(index:number,next:ProcedureSection){onChange(current.current.map((section,i)=>i===index?next:section));}
+ function update(index:number,next:ProcedureSection){
+  const stepCount=next.steps.filter(step=>step.trim()).length;
+  onChange(current.current.map((section,i)=>i===index?{...next,images:next.images.map(image=>image.step&&image.step>stepCount?{...image,step:undefined}:image)}:section));
+ }
  async function upload(index:number,files:File[]){
   if(busy||!files.length)return;
   const section=current.current[index];
   if(section.images.length+files.length>10){setError("Use até 10 imagens por seção.");return;}
   setBusy(true);onBusy(true);setError("");
+  const uploaded:ArticleImage[]=[];
   try{
-   const uploaded:ArticleImage[]=[];
    for(const file of files){
     const content=await prepare(file);
     const response=await fetch("/api/uploads",{method:"POST",credentials:"same-origin",headers:{"Content-Type":content.type},body:content});
@@ -41,20 +45,24 @@ export default function ProcedureEditor({value,steps,onChange,onBusy,onPreview}:
     setPreviews(old=>({...old,[image.id]:image.previewUrl}));
     onPreview(image.id,image.previewUrl);
    }
-   update(index,{...current.current[index],images:[...current.current[index].images,...uploaded]});
-  }catch(error){setError(errorMessage(error));}finally{setBusy(false);onBusy(false);}
+  }catch(error){setError(errorMessage(error));}finally{
+   if(uploaded.length)update(index,{...current.current[index],images:[...current.current[index].images,...uploaded]});
+   setBusy(false);onBusy(false);
+  }
  }
  function paste(event:ClipboardEvent<HTMLTextAreaElement>,index:number){
   const files=Array.from(event.clipboardData.files).filter(file=>file.type==="image/png"||file.type==="image/jpeg");
   if(files.length){event.preventDefault();void upload(index,files);}
  }
- return <section className="kb-editor-section"><div className="kb-procedure-heading"><div><h2>Procedimentos com imagens</h2><p>Organize o atendimento em seções e vincule cada print ao passo correspondente.</p></div><button type="button" className="kb-secondary" disabled={busy||value.length>=20} onClick={()=>onChange([...value,{id:sectionId(),title:value.length?"Nova seção":"Procedimento",steps:value.length?[""]:steps,images:[]}])}>+ Seção</button></div>
+ return <section className="kb-editor-section"><div className="kb-procedure-heading"><div><h2>3. Passos e imagens</h2><p>Escreva um passo por linha. Os prints são opcionais.</p></div><button type="button" className="kb-secondary" disabled={busy||value.length>=20} onClick={()=>onChange([...value,{id:sectionId(),title:value.length?"Nova seção":"Procedimento",steps:value.length?[""]:steps,images:[]}])}><Icon name="plus" size={16}/> Seção</button></div>
   {error&&<p role="alert" className="kb-error-text">{error}</p>}{busy&&<p role="status">Enviando e preparando imagens…</p>}
-  {value.map((section,index)=><fieldset key={section.id} disabled={busy} className="kb-procedure-section"><legend>Seção {index+1}</legend><label className="kb-field"><span>Título da seção {index+1}</span><input required minLength={2} maxLength={120} value={section.title} onChange={e=>update(index,{...section,title:e.target.value})}/></label><label className="kb-field"><span>Passos da seção {index+1} — um por linha</span><textarea rows={5} value={section.steps.join("\n")} onChange={e=>update(index,{...section,steps:e.target.value.split("\n")})}/></label>
+  {value.map((section,index)=><fieldset key={section.id} disabled={busy} className="kb-procedure-section"><legend>Seção {index+1}</legend><label className="kb-field"><span>Título da seção {index+1}</span><input aria-label={"Título da seção "+(index+1)} required minLength={2} maxLength={120} value={section.title} onChange={e=>update(index,{...section,title:e.target.value})}/></label><label className="kb-field"><span>Passos da seção {index+1}</span><textarea aria-label={"Passos da seção "+(index+1)} required={!section.images.length} maxLength={60000} rows={5} placeholder="1º passo: abra a rotina…" value={section.steps.join("\n")} onChange={e=>update(index,{...section,steps:e.target.value.split("\n")})}/></label>
+   <div className="kb-attachment-actions">
    <label className="kb-field"><span>Adicionar prints à seção {index+1}</span><input aria-label={"Adicionar prints à seção "+(index+1)} type="file" accept="image/png,image/jpeg" multiple onChange={e=>{void upload(index,Array.from(e.target.files||[]));e.target.value="";}}/><small>PNG ou JPG · até 5 MB por imagem · até 10 por seção.</small></label>
-   <label className="kb-field"><span>Colar print da seção {index+1}</span><textarea aria-label={"Colar print da seção "+(index+1)} rows={2} placeholder="Clique aqui e pressione Ctrl+V" onPaste={e=>paste(e,index)}/></label>
+   <label className="kb-field"><span>Colar print da seção {index+1}</span><textarea className="kb-paste-area" aria-label={"Colar print da seção "+(index+1)} rows={2} placeholder="Clique aqui e pressione Ctrl+V" onPaste={e=>paste(e,index)}/></label>
+   </div>
    <div className="kb-images-editor">{section.images.map((image,imageIndex)=><div key={image.id} className="kb-image-editor"><img src={previews[image.id]||image.url} alt={image.caption||"Print do procedimento"} loading="lazy"/><label className="kb-field"><span>Legenda do print {imageIndex+1}</span><input maxLength={500} value={image.caption} onChange={e=>update(index,{...section,images:section.images.map((item,i)=>i===imageIndex?{...item,caption:e.target.value}:item)})}/></label><label className="kb-field"><span>Vincular ao passo</span><select value={image.step||""} onChange={e=>update(index,{...section,images:section.images.map((item,i)=>i===imageIndex?{...item,step:e.target.value?Number(e.target.value):undefined}:item)})}><option value="">Seção inteira</option>{section.steps.filter(step=>step.trim()).map((_,i)=><option key={i} value={i+1}>Passo {i+1}</option>)}</select></label><button type="button" className="kb-text-button kb-error-text" onClick={()=>update(index,{...section,images:section.images.filter(item=>item.id!==image.id)})}>Remover print {imageIndex+1}</button></div>)}</div>
-   <button type="button" className="kb-text-button" onClick={()=>onChange(current.current.filter((_,i)=>i!==index))}>Remover seção {index+1}</button>
+   {value.length>1&&<button type="button" className="kb-text-button kb-error-text" onClick={()=>onChange(current.current.filter((_,i)=>i!==index))}>Remover seção {index+1}</button>}
   </fieldset>)}
  </section>;
 }

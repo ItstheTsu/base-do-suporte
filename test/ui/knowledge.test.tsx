@@ -12,6 +12,8 @@ import { MemoryRouter, Route, Routes } from "react-router";
 import Catalog from "../../src/client/knowledge/Catalog";
 import ArticleEditor from "../../src/client/knowledge/ArticleEditor";
 import ArticleContent from "../../src/client/knowledge/ArticleContent";
+import ArticlePage from "../../src/client/knowledge/ArticlePage";
+import { copyLink } from "../../src/client/knowledge/clipboard";
 import {
   SessionContext,
   type SessionValue,
@@ -67,6 +69,8 @@ function json(data: unknown, status = 200) {
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+  delete (document as any).execCommand;
 });
 
 describe("consulta pública", () => {
@@ -134,7 +138,7 @@ describe("consulta pública", () => {
     await user.click(
       screen.getByRole("button", { name: "Buscar", exact: true }),
     );
-    await screen.findByText("Nenhum artigo por aqui");
+    await screen.findByText("Nenhum artigo encontrado");
     await act(async () => {
       finishOld(json({ items: [article], total: 1, page: 1, limit: 12 }));
     });
@@ -299,9 +303,47 @@ it("apresenta seções, prints e colagem sem depender de Clipboard API de contex
  render(<ProcedureEditor value={[{id:"secao-a",title:"Análise",steps:["Conferir o retorno."],images:[]}]} steps={[]} onChange={onChange} onBusy={()=>{}} onPreview={()=>{}}/>);
  expect(screen.getByLabelText("Adicionar prints à seção 1")).toBeDefined();
  expect(screen.getByLabelText("Colar print da seção 1")).toBeDefined();
- fireEvent.click(screen.getByRole("button",{name:"+ Seção"}));expect(onChange.mock.calls[0][0]).toHaveLength(2);
+ fireEvent.click(screen.getByRole("button",{name:"Seção"}));expect(onChange.mock.calls[0][0]).toHaveLength(2);
 });
 it("exibe seções, legendas, mensagem e escalonamento nos procedimentos",()=>{
  render(<ArticleContent article={{...article,databaseMode:"read",requiresEscalation:true,errorMessage:"Retorno completo",procedureSections:[{id:"analise",title:"Análise no sistema",steps:["Conferir o retorno."],images:[{id:"image-a",url:"/api/uploads/image-a",caption:"Clique em Extrato",step:1}]}]}}/>);
  expect(screen.getByText("Análise no sistema")).toBeDefined();expect(screen.getByAltText("Clique em Extrato")).toBeDefined();expect(screen.getByText("Consulta ao banco de dados")).toBeDefined();expect(screen.getByText("Escalonamento necessário · N2 / Supervisor")).toBeDefined();expect(screen.getByText("Retorno completo")).toBeDefined();
+});
+
+it("editar passos antigos preserva o conteúdo no procedimento e na leitura compatível", async()=>{
+ let saved:any;
+ vi.stubGlobal("fetch",vi.fn(async(_path:string,options:RequestInit)=>{
+  if(options.method==="PATCH"){saved=JSON.parse(options.body as string);return json({...article,...saved,version:2});}
+  return json(article);
+ }));
+ render(<SessionContext.Provider value={{...session,user:null}}><MemoryRouter initialEntries={["/artigos/conferir-lote/editar"]}><Routes><Route path="/artigos/:slug/editar" element={<ArticleEditor/>}/></Routes></MemoryRouter></SessionContext.Provider>);
+ const input=await screen.findByLabelText("Passos da seção 1");
+ expect((input as HTMLTextAreaElement).value).toBe(article.steps[0]);
+ expect(screen.queryByLabelText(/Passos do procedimento/)).toBeNull();
+ fireEvent.change(input,{target:{value:"Primeiro, confira a entrada.\nDepois, valide o retorno."}});
+ fireEvent.click(screen.getByRole("button",{name:"Salvar publicação"}));
+ await screen.findByText("Artigo publicado. A leitura pública já está disponível.");
+ expect(saved.steps).toEqual(["Primeiro, confira a entrada.","Depois, valide o retorno."]);
+ expect(saved.procedureSections[0].steps).toEqual(saved.steps);
+ expect(saved.version).toBe(1);
+});
+
+it("copiar link em HTTP usa o recurso disponível e restaura o foco",async()=>{
+ vi.spyOn(navigator,"clipboard","get").mockReturnValue(undefined as any);
+ const command=vi.fn(()=>{expect((document.activeElement as HTMLTextAreaElement).value).toBe("http://172.20.80.35:1992/artigos/teste");return true;});
+ Object.defineProperty(document,"execCommand",{configurable:true,value:command});
+ const button=document.createElement("button");document.body.append(button);button.focus();
+ expect(await copyLink("http://172.20.80.35:1992/artigos/teste")).toBe(true);
+ expect(document.activeElement).toBe(button);expect(command).toHaveBeenCalledWith("copy");button.remove();
+ delete (document as any).execCommand;
+});
+
+it("sem nenhum recurso de cópia o artigo oferece o endereço selecionável",async()=>{
+ vi.spyOn(navigator,"clipboard","get").mockReturnValue(undefined as any);
+ vi.stubGlobal("fetch",vi.fn(async(path:string)=>path.includes("/articles?")?json({items:[],total:0,page:1,limit:12}):json(article)));
+ render(<MemoryRouter initialEntries={["/artigos/conferir-lote"]}><Routes><Route path="/artigos/:slug" element={<ArticlePage/>}/></Routes></MemoryRouter>);
+ fireEvent.click(await screen.findByRole("button",{name:"Copiar link"}));
+ const field=await screen.findByLabelText("Link deste artigo");
+ expect((field as HTMLInputElement).readOnly).toBe(true);
+ expect(screen.getByText("Selecione e copie o endereço abaixo.")).toBeDefined();
 });
