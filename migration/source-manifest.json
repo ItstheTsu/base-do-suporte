@@ -1,0 +1,736 @@
+{
+  "generatedAt": "2026-11-05",
+  "kind": "file-snapshots-not-complete-git-history",
+  "sources": [
+    {
+      "repository": "ItstheTsu/support-repository",
+      "ref": "master",
+      "commit": "5722942512b969863ee621f4cbb4c52ddb1583c6"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "ref": "main",
+      "commit": "6e995eab7bb9192f914af8ce9326a830023d1436"
+    }
+  ],
+  "files": [
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": ".env.example",
+      "sha": "5a001ede82519e76e2330baf17292f8ac842fc8b",
+      "size": 189,
+      "archivePath": "archive/support-repository/.env.example"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": ".gitignore",
+      "sha": "57859ff834649185cad3f2158fb3f4d0e1a5656a",
+      "size": 265,
+      "archivePath": "archive/support-repository/.gitignore"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": ".hintrc",
+      "sha": "2fa1a2e82ab83510765d8ca0b980f9cbed226483",
+      "size": 145,
+      "archivePath": "archive/support-repository/.hintrc"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": ".oxlintrc.json",
+      "sha": "6fa991dad24b57eb19c9cefba8ea12fd1870ed07",
+      "size": 245,
+      "archivePath": "archive/support-repository/.oxlintrc.json"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "README.md",
+      "sha": "fc57ab7ad4169291ca43b7341310522f2964b1d1",
+      "size": 3050,
+      "archivePath": "archive/support-repository/README.md"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "docs/REVISAO_BASE_DO_SUPORTE.md",
+      "sha": "dc306ff66739864d513a3a834ca9e42196d0ab4f",
+      "size": 12350,
+      "archivePath": "archive/support-repository/docs/REVISAO_BASE_DO_SUPORTE.md"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "index.html",
+      "sha": "81ed6666b00a9ca0702038ea8500bea67fcc77e7",
+      "size": 516,
+      "archivePath": "archive/support-repository/index.html"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "package-lock.json",
+      "sha": "bf7d37ac60159edfdf6ca232163b8ce5b743e26b",
+      "size": 127415,
+      "archivePath": "archive/support-repository/package-lock.json"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "package.json",
+      "sha": "4e0c381e1de5a1e606e6b5604e9c6ee8b6689438",
+      "size": 1086,
+      "archivePath": "archive/support-repository/package.json"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "public/assets/images/favicon.svg",
+      "sha": "18015b62bc9f25081e95cc60f423cdc39ddf2048",
+      "size": 481,
+      "archivePath": "archive/support-repository/public/assets/images/favicon.svg"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "public/assets/images/hero.webp",
+      "sha": "5ce669c4531cfd19947351746b192cf353b80a2d",
+      "size": 18260,
+      "archivePath": "archive/support-repository/public/assets/images/hero.webp"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "skills-lock.json",
+      "sha": "f23845f8cef7c9212cf717a15675467e8690c85a",
+      "size": 277,
+      "archivePath": "archive/support-repository/skills-lock.json"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/Loading.tsx",
+      "sha": "5d28f987056fd337765aa872abb81e4f6766fd03",
+      "size": 810,
+      "archivePath": "archive/support-repository/src/components/Loading.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/buttons/AddIncident.tsx",
+      "sha": "02e15a03f434f8adb5c69075f6eafc42c4252f56",
+      "size": 295,
+      "archivePath": "archive/support-repository/src/components/buttons/AddIncident.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/buttons/AddTag.tsx",
+      "sha": "56d3789e35d5b90c0762a88810dff8eb728e5a9d",
+      "size": 476,
+      "archivePath": "archive/support-repository/src/components/buttons/AddTag.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/buttons/Button.tsx",
+      "sha": "84891d90f0fc7f73a614ce01263025b11d2890ba",
+      "size": 1738,
+      "archivePath": "archive/support-repository/src/components/buttons/Button.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/cards/IncidentCard.tsx",
+      "sha": "cd4ea2908644b3b00a2d6ed7f364152574e8ca51",
+      "size": 1414,
+      "archivePath": "archive/support-repository/src/components/cards/IncidentCard.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/cards/TagCard.tsx",
+      "sha": "456e96b68d770c8222d3a6c48fa7f3e229466560",
+      "size": 1401,
+      "archivePath": "archive/support-repository/src/components/cards/TagCard.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/fields/DifficultyBadge.tsx",
+      "sha": "ba4a48bafd45a431d4618cb746c1d5f2e6f3ceec",
+      "size": 749,
+      "archivePath": "archive/support-repository/src/components/fields/DifficultyBadge.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/fields/FieldTag.tsx",
+      "sha": "e9d75fcc9deff3ef0de26253df2b95f6be5bc841",
+      "size": 788,
+      "archivePath": "archive/support-repository/src/components/fields/FieldTag.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/fields/StatusBadge.tsx",
+      "sha": "7c545fcc4ed176993d5993b836320de745ca27a9",
+      "size": 819,
+      "archivePath": "archive/support-repository/src/components/fields/StatusBadge.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/inputs/SearchInput.tsx",
+      "sha": "2440b6ed80bd31897fedf88aa0bf765e9617cd47",
+      "size": 1571,
+      "archivePath": "archive/support-repository/src/components/inputs/SearchInput.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/inputs/SelectDifficulty.tsx",
+      "sha": "44b7965bb1d204a69232db668d929734316cd2de",
+      "size": 1506,
+      "archivePath": "archive/support-repository/src/components/inputs/SelectDifficulty.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/inputs/TextArea.tsx",
+      "sha": "0f044990f8d49213da565a8b573b0ed9507c7a31",
+      "size": 1139,
+      "archivePath": "archive/support-repository/src/components/inputs/TextArea.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/inputs/TextField.tsx",
+      "sha": "c44ebfac880b40045fb0d8fc754a93a9e2be99fd",
+      "size": 1077,
+      "archivePath": "archive/support-repository/src/components/inputs/TextField.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/layout/Footer.tsx",
+      "sha": "2e79d8adfbc9f702665a15420fffb4cb9d54ae4c",
+      "size": 272,
+      "archivePath": "archive/support-repository/src/components/layout/Footer.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/layout/Header.tsx",
+      "sha": "14535e1f5800e8831eb02c1d5cb2813af4973b63",
+      "size": 1767,
+      "archivePath": "archive/support-repository/src/components/layout/Header.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/layout/Sidebar.tsx",
+      "sha": "67d61309f95db69d4d3fb609d2c877a633d0bf8f",
+      "size": 3187,
+      "archivePath": "archive/support-repository/src/components/layout/Sidebar.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/modals/ConfirmDeleteModal.tsx",
+      "sha": "b490342856ec76f1eb67a20d379769bca54667b3",
+      "size": 1336,
+      "archivePath": "archive/support-repository/src/components/modals/ConfirmDeleteModal.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/modals/CreateIncidentModal.tsx",
+      "sha": "f74faa73b03c88000eaea5da5e59cd838c49aa4c",
+      "size": 6896,
+      "archivePath": "archive/support-repository/src/components/modals/CreateIncidentModal.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/modals/EditIncidentModal.tsx",
+      "sha": "f33bd50fa0e38701e18a1ed35cb9d487ab306819",
+      "size": 4731,
+      "archivePath": "archive/support-repository/src/components/modals/EditIncidentModal.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/modals/IncidentPreviewModal.tsx",
+      "sha": "ca191378a4a7fc6e01f2b2777d92e43d63fb1b82",
+      "size": 2998,
+      "archivePath": "archive/support-repository/src/components/modals/IncidentPreviewModal.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/modals/SearchTagsModal.tsx",
+      "sha": "baa13d4279460e504f19ec0b73d50135bba11d3e",
+      "size": 2837,
+      "archivePath": "archive/support-repository/src/components/modals/SearchTagsModal.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/sql/SqlConsole.tsx",
+      "sha": "4ed88dcd30045283a9372433669b703668542756",
+      "size": 2143,
+      "archivePath": "archive/support-repository/src/components/sql/SqlConsole.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/sql/SqlEditor.tsx",
+      "sha": "7e733044035d8b05e26221a3839bf5718ef8da47",
+      "size": 1073,
+      "archivePath": "archive/support-repository/src/components/sql/SqlEditor.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/sql/SqlResult.tsx",
+      "sha": "88582244be3aa7090a05f1c582acc6da08d6c5f8",
+      "size": 1702,
+      "archivePath": "archive/support-repository/src/components/sql/SqlResult.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/components/sql/SqlToolbar.tsx",
+      "sha": "d8f93588a85564acd714ba7c047de925345d3438",
+      "size": 1192,
+      "archivePath": "archive/support-repository/src/components/sql/SqlToolbar.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/contexts/AuthContext.tsx",
+      "sha": "ba4b6fb8f2a44609a1cf97ac621e2d38ed2c0e3b",
+      "size": 2271,
+      "archivePath": "archive/support-repository/src/contexts/AuthContext.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/contexts/IncidentContext.tsx",
+      "sha": "50b8e69463a4fe4a6206a6a89740dc5b216a8b28",
+      "size": 3610,
+      "archivePath": "archive/support-repository/src/contexts/IncidentContext.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/contexts/ModalContext.tsx",
+      "sha": "37d1d631650fdc38518e054cbc259fd1e73cb17d",
+      "size": 1890,
+      "archivePath": "archive/support-repository/src/contexts/ModalContext.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/contexts/SearchContext.tsx",
+      "sha": "7e8adfb89d345fb2e59ef13ddf900b581b79be1d",
+      "size": 1777,
+      "archivePath": "archive/support-repository/src/contexts/SearchContext.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/knowledge/App.tsx",
+      "sha": "29b0fa048ce1a1c3e80849116d69f8e518cf9df1",
+      "size": 3004,
+      "archivePath": "archive/support-repository/src/knowledge/App.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/knowledge/ArticleContent.tsx",
+      "sha": "124de3c6f4c3ba3a930560230b953dd1ec7ef9fe",
+      "size": 2012,
+      "archivePath": "archive/support-repository/src/knowledge/ArticleContent.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/knowledge/ArticleEditor.tsx",
+      "sha": "0118fe9dc67bb854a55efb60668b32f93286e41c",
+      "size": 16410,
+      "archivePath": "archive/support-repository/src/knowledge/ArticleEditor.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/knowledge/ArticlePage.tsx",
+      "sha": "9edbc4408ff1e0d0311eb58a96b49fef25c45e7d",
+      "size": 4636,
+      "archivePath": "archive/support-repository/src/knowledge/ArticlePage.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/knowledge/Catalog.tsx",
+      "sha": "5b51da030dbee73d1db356cae83ef86569406636",
+      "size": 11440,
+      "archivePath": "archive/support-repository/src/knowledge/Catalog.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/knowledge/Session.tsx",
+      "sha": "bcc260174ae2da21f4c9f79ae3b46f3c44468fbf",
+      "size": 968,
+      "archivePath": "archive/support-repository/src/knowledge/Session.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/knowledge/SupportPage.tsx",
+      "sha": "b57d7785abe53f41b3f6824472d005cbb3bff22f",
+      "size": 11357,
+      "archivePath": "archive/support-repository/src/knowledge/SupportPage.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/knowledge/api.ts",
+      "sha": "d76b5e4256be3918486110d070c16433f925dbd4",
+      "size": 1347,
+      "archivePath": "archive/support-repository/src/knowledge/api.ts"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/knowledge/article-sections.ts",
+      "sha": "0ba39f1b8af25cfac62d826a95a784465143df64",
+      "size": 242,
+      "archivePath": "archive/support-repository/src/knowledge/article-sections.ts"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/knowledge/session-context.ts",
+      "sha": "5097ee0664f423311674d815b08a517284b8162b",
+      "size": 457,
+      "archivePath": "archive/support-repository/src/knowledge/session-context.ts"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/knowledge/styles.css",
+      "sha": "bc467cf94d9139466bbc29846a2aec6f1136da5e",
+      "size": 23426,
+      "archivePath": "archive/support-repository/src/knowledge/styles.css"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/knowledge/types.ts",
+      "sha": "e48eb2f899d67204bd1e0d024a53b7b94320f9a1",
+      "size": 947,
+      "archivePath": "archive/support-repository/src/knowledge/types.ts"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/main.tsx",
+      "sha": "f934c22bccea06c96a33c5ca2268d91ed570ee0f",
+      "size": 359,
+      "archivePath": "archive/support-repository/src/main.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/models/IncidentModel.tsx",
+      "sha": "2c832f79666fde8f9f91e0b0e3e9bf88d50c6bcc",
+      "size": 1182,
+      "archivePath": "archive/support-repository/src/models/IncidentModel.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/models/TagModel.tsx",
+      "sha": "be90b7622b2d9a48a28c7f70d56e6237a51e42b9",
+      "size": 318,
+      "archivePath": "archive/support-repository/src/models/TagModel.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/models/UserModel.tsx",
+      "sha": "7ba1068202595ca0f42174daf2802d1dec8e012f",
+      "size": 384,
+      "archivePath": "archive/support-repository/src/models/UserModel.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/pages/CreateIncident.tsx",
+      "sha": "8fe87b46d68c1fc777e1ee8f3f9f05e5b499cdb8",
+      "size": 4757,
+      "archivePath": "archive/support-repository/src/pages/CreateIncident.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/pages/Home.tsx",
+      "sha": "4937a0f162532cc8940b0e5e0b6c903238702449",
+      "size": 1759,
+      "archivePath": "archive/support-repository/src/pages/Home.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/pages/Incident.tsx",
+      "sha": "29d10d35ca9a1ed7b345ce3c96874a04d6e6e8a6",
+      "size": 2221,
+      "archivePath": "archive/support-repository/src/pages/Incident.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/pages/LoginPage.tsx",
+      "sha": "90b3169869d2c103a17060c19b6be453163dd613",
+      "size": 4825,
+      "archivePath": "archive/support-repository/src/pages/LoginPage.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/pages/NotFound.tsx",
+      "sha": "2d92587d5d95e2a3762b359c91b37a64208a6cc5",
+      "size": 533,
+      "archivePath": "archive/support-repository/src/pages/NotFound.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/pages/Ranking.tsx",
+      "sha": "a5a95242dbb31083fcfdf59c1f2fdab33edcf744",
+      "size": 2175,
+      "archivePath": "archive/support-repository/src/pages/Ranking.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/pages/TagsPage.tsx",
+      "sha": "c4b1b26b4d57b48de908e4a47731c619ec74faff",
+      "size": 6874,
+      "archivePath": "archive/support-repository/src/pages/TagsPage.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/pages/UsersPage.tsx",
+      "sha": "c2b990b83475811631c8021ff1ac9d29fce2372a",
+      "size": 3844,
+      "archivePath": "archive/support-repository/src/pages/UsersPage.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/services/ApiConfig.ts",
+      "sha": "1343779d70feba267d8a149d4e9b7f83e1590e88",
+      "size": 741,
+      "archivePath": "archive/support-repository/src/services/ApiConfig.ts"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/services/AuthService.ts",
+      "sha": "725080e79349409d69817c9ec38cc5c0eec44fb5",
+      "size": 741,
+      "archivePath": "archive/support-repository/src/services/AuthService.ts"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/services/IncidentService.ts",
+      "sha": "b6df6d2f08a2a6be5703a569640c9488bc720efc",
+      "size": 1983,
+      "archivePath": "archive/support-repository/src/services/IncidentService.ts"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/services/TagService.ts",
+      "sha": "0736c9c6646e770838324cb2e5e94bd1a12f617c",
+      "size": 863,
+      "archivePath": "archive/support-repository/src/services/TagService.ts"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/services/UserService.ts",
+      "sha": "233db667dbd1bf786a2f2839de7b3dc61ef8b50f",
+      "size": 431,
+      "archivePath": "archive/support-repository/src/services/UserService.ts"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "src/style.css",
+      "sha": "3692835fb2bb94ed40b79d0abe205ab924ca606f",
+      "size": 3087,
+      "archivePath": "archive/support-repository/src/style.css"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "tailwind.config.ts",
+      "sha": "fd67c1dd31cf5c21b85753d9f4e7b3903095ed9b",
+      "size": 1029,
+      "archivePath": "archive/support-repository/tailwind.config.ts"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "test/knowledge.test.tsx",
+      "sha": "0c556af7bbface3d905cd969b0ae58c2ba894b5a",
+      "size": 9904,
+      "archivePath": "archive/support-repository/test/knowledge.test.tsx"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "tsconfig.app.json",
+      "sha": "7f42e5f7cd2e79c7b5a25b753e56b1bcf94e1381",
+      "size": 617,
+      "archivePath": "archive/support-repository/tsconfig.app.json"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "tsconfig.json",
+      "sha": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
+      "size": 119,
+      "archivePath": "archive/support-repository/tsconfig.json"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "tsconfig.node.json",
+      "sha": "8455dcbc2c947322adef8783a42741878edaea9c",
+      "size": 558,
+      "archivePath": "archive/support-repository/tsconfig.node.json"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "vite.config.ts",
+      "sha": "b1fe8f68b13d795cbe9a54d4b10a02866bbe9bcd",
+      "size": 347,
+      "archivePath": "archive/support-repository/vite.config.ts"
+    },
+    {
+      "repository": "ItstheTsu/support-repository",
+      "path": "vitest.config.ts",
+      "sha": "2fde025f615d61eb6ec0bc7c7f53d8a5e23d860a",
+      "size": 247,
+      "archivePath": "archive/support-repository/vitest.config.ts"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": ".env.example",
+      "sha": "4133e53393094a99b127d9ae081bb302b476f1ae",
+      "size": 419,
+      "archivePath": "archive/support-repository-api/.env.example"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": ".gitignore",
+      "sha": "1880fe3186e2804f479d7b9ff0e3e3badb2a358e",
+      "size": 72,
+      "archivePath": "archive/support-repository-api/.gitignore"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "INICIAR.bat",
+      "sha": "d5d2bbac5f059ceaf59bfb68fb6afce7f5cf17b5",
+      "size": 63,
+      "archivePath": "archive/support-repository-api/INICIAR.bat"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "INICIAR_SITE.cmd",
+      "sha": "6507d12911f79ed434753bded196be127e2372b7",
+      "size": 3461,
+      "archivePath": "archive/support-repository-api/INICIAR_SITE.cmd"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "README.md",
+      "sha": "e9f2b4ed9ab1bd576f22c96d9f7caf2317463e21",
+      "size": 7488,
+      "archivePath": "archive/support-repository-api/README.md"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "app/api/auth.py",
+      "sha": "f0d680d7ecee759be6a967ab5bd72a17244cd780",
+      "size": 3627,
+      "archivePath": "archive/support-repository-api/app/api/auth.py"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "app/api/incidents_new.py",
+      "sha": "f8b588608f20a0ff4ba902b217b58dde1c03e750",
+      "size": 8104,
+      "archivePath": "archive/support-repository-api/app/api/incidents_new.py"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "app/api/ranking_new.py",
+      "sha": "1f5962d03268339650c28f0e685e6290fabbd358",
+      "size": 555,
+      "archivePath": "archive/support-repository-api/app/api/ranking_new.py"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "app/api/tags_new.py",
+      "sha": "1a59b9ad2da576cf508c02e11ea380d7be182fdc",
+      "size": 2503,
+      "archivePath": "archive/support-repository-api/app/api/tags_new.py"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "app/api/users.py",
+      "sha": "ad6727e6efcaef2354e88cb5ccd9f67fc0e4b673",
+      "size": 1166,
+      "archivePath": "archive/support-repository-api/app/api/users.py"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "app/database_new.py",
+      "sha": "38c55fc0772f40244f5f638e110f5eb4a6c1e809",
+      "size": 512,
+      "archivePath": "archive/support-repository-api/app/database_new.py"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "app/main_new.py",
+      "sha": "ec4eee3cbd30f12cb412087bce5ecf4f40c1e950",
+      "size": 1117,
+      "archivePath": "archive/support-repository-api/app/main_new.py"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "content/sngpc.json",
+      "sha": "0cd603d2b9553d53963a58361fdb5ae0af231041",
+      "size": 7872,
+      "archivePath": "archive/support-repository-api/content/sngpc.json"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "package-lock.json",
+      "sha": "ee71e314012457a2380f47d38047f5ac6fae1321",
+      "size": 31810,
+      "archivePath": "archive/support-repository-api/package-lock.json"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "package.json",
+      "sha": "ffc2234e4ef5b39fed61c3a0d7dd45d79be41a6d",
+      "size": 556,
+      "archivePath": "archive/support-repository-api/package.json"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "requirements.txt",
+      "sha": "e10c307ae91ff4b041a6af1cdc2aa94cd4b3fc37",
+      "size": 83,
+      "archivePath": "archive/support-repository-api/requirements.txt"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "scripts/hash-password.js",
+      "sha": "1e3862f0dac709930b909d468c70cfb4b707a3d1",
+      "size": 987,
+      "archivePath": "archive/support-repository-api/scripts/hash-password.js"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "src/app.js",
+      "sha": "421b6c22aef916356ce4535a97ccab87fe1480fe",
+      "size": 7056,
+      "archivePath": "archive/support-repository-api/src/app.js"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "src/article.js",
+      "sha": "44e6f35af568091812c76d1bf4823be40f1715be",
+      "size": 2726,
+      "archivePath": "archive/support-repository-api/src/article.js"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "src/auth.js",
+      "sha": "c223cca7cbff7e73e84bb25ecc182902a42f70d8",
+      "size": 2576,
+      "archivePath": "archive/support-repository-api/src/auth.js"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "src/seed.js",
+      "sha": "08779566b3a14a220c05cc7ce0b8d1af52908746",
+      "size": 1081,
+      "archivePath": "archive/support-repository-api/src/seed.js"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "src/server.js",
+      "sha": "d1d59875e5cb9cc5efa7d7666c22325adbe27063",
+      "size": 1296,
+      "archivePath": "archive/support-repository-api/src/server.js"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "src/store.js",
+      "sha": "792e3823e6bb65d5a2d08a60872e82df434cac25",
+      "size": 8750,
+      "archivePath": "archive/support-repository-api/src/store.js"
+    },
+    {
+      "repository": "ItstheTsu/support-repository-api",
+      "path": "test/api.test.js",
+      "sha": "064e833ed94e59491195057f5dd09220bffe1945",
+      "size": 16398,
+      "archivePath": "archive/support-repository-api/test/api.test.js"
+    }
+  ],
+  "zipComparison": {
+    "file": "base-do-suporte-http-1992.zip",
+    "status": "pending-execution-environment"
+  }
+}

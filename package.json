@@ -1,0 +1,47 @@
+{
+  "name": "base-do-suporte",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Base de conhecimento colaborativa do suporte — aplicação unificada.",
+  "engines": {
+    "node": ">=24.0.0 <25"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/server/server.js",
+    "iniciar": "node scripts/launch.mjs",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "test:api": "node --test test/api.test.js",
+    "test:ui": "vitest run",
+    "test": "npm run test:api && npm run test:ui",
+    "lint": "oxlint src/client test/ui",
+    "seed": "node --env-file-if-exists=.env src/server/seed.js",
+    "password:hash": "node scripts/hash-password.js",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "express": "5.3.0",
+    "express-rate-limit": "8.7.3",
+    "helmet": "8.3.0",
+    "zod": "4.6.7",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "react-router": "8.5.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.3.1",
+    "tailwindcss": "4.3.1",
+    "@testing-library/react": "16.3.3",
+    "@testing-library/user-event": "14.6.8",
+    "@types/node": "24.13.2",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.3",
+    "jsdom": "31.0.0",
+    "oxlint": "1.71.0",
+    "typescript": "6.0.3",
+    "vite": "8.3.6",
+    "vitest": "5.1.0"
+  }
+}

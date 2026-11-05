@@ -1,0 +1,21 @@
+import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
+import { networkInterfaces } from "node:os";
+import { openStore } from "./store.js";
+import { createApp } from "./app.js";
+export const ROOT=fileURLToPath(new URL("../../",import.meta.url));
+const production=process.env.NODE_ENV==="production";
+const port=Number(process.env.PORT||1992);
+const publicOrigin=process.env.PUBLIC_ORIGIN||"http://localhost:"+port;
+const secureCookies=process.env.COOKIE_SECURE==="true";
+const origin=new URL(publicOrigin);
+if(publicOrigin!==origin.origin||!["http:","https:"].includes(origin.protocol)||(secureCookies&&origin.protocol!=="https:"))throw new Error("PUBLIC_ORIGIN inválida para o protocolo configurado.");
+const addresses=Object.values(networkInterfaces()).flat().filter(item=>item&&item.family==="IPv4").map(item=>item.address);
+const allowedOrigins=secureCookies?[publicOrigin]:[publicOrigin,...["localhost","127.0.0.1",...addresses].map(host=>"http://"+host+":"+port)];
+const store=openStore(resolve(ROOT,process.env.DATABASE_PATH||"./data/knowledge.sqlite"));
+const app=createApp({store,config:{production,secureCookies,publicOrigin,allowedOrigins,username:process.env.SUPPORT_USERNAME||"suporte",passwordHash:process.env.SUPPORT_PASSWORD_HASH||"",frontendDist:resolve(ROOT,process.env.FRONTEND_DIST||"dist")}});
+const server=app.listen(port,process.env.HOST||"0.0.0.0",()=>{
+ console.log("Base do Suporte: "+publicOrigin);
+ if(!secureCookies)for(const host of addresses.filter(host=>!host.startsWith("127.")))console.log("Rede interna: http://"+host+":"+port);
+});
+for(const signal of ["SIGINT","SIGTERM"])process.on(signal,()=>server.close(()=>{store.close();process.exit(0);}));

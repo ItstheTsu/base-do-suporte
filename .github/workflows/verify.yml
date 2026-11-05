@@ -1,0 +1,104 @@
+name: Verificar aplicação unificada
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      revision: ${{ steps.revision.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+      - name: Normalizar lockfile unificado
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Registrar lockfile
+        if: github.event_name != 'pull_request'
+        run: |
+          git add package-lock.json
+          if ! git diff --cached --quiet; then
+            git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "build: normaliza lockfile da aplicação unificada"
+            git push
+          fi
+      - id: revision
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  verify:
+    needs: lockfile
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ needs.lockfile.outputs.revision }}
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --include=dev
+      - run: npm test
+      - run: npm run build
+      - run: npm run lint
+      - run: npm run smoke
+      - name: Verificar CMD no Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:PORT = "21992"
+          $env:PUBLIC_ORIGIN = "http://localhost:21992"
+          $env:DATABASE_PATH = Join-Path $env:RUNNER_TEMP "base-launch-test.sqlite"
+          $env:BASE_NO_OPEN = "1"
+          $out = Join-Path $env:RUNNER_TEMP "base-launch-out.log"
+          $err = Join-Path $env:RUNNER_TEMP "base-launch-err.log"
+          $launcher = Start-Process -FilePath "cmd.exe" -ArgumentList "/d", "/c", "INICIAR_SITE.cmd" -PassThru -NoNewWindow -RedirectStandardOutput $out -RedirectStandardError $err
+          try {
+            $ready = $false
+            for ($attempt = 0; $attempt -lt 120; $attempt++) {
+              if ($launcher.HasExited) { throw "O CMD encerrou antes de iniciar o site." }
+              try {
+                $health = Invoke-RestMethod "http://127.0.0.1:21992/api/health" -TimeoutSec 1
+                if ($health.service -eq "base-do-suporte") { $ready = $true; break }
+              } catch {}
+              Start-Sleep -Seconds 2
+            }
+            if (-not $ready) { throw "O CMD nao iniciou o site no prazo." }
+            Write-Host "CMD validado: servidor respondeu na porta 21992."
+          } finally {
+            if (-not $launcher.HasExited) { taskkill /PID $launcher.Id /T /F | Out-Null }
+            if (Test-Path $out) { Get-Content $out }
+            if (Test-Path $err) { Get-Content $err }
+          }
+      - run: npm audit --omit=dev
+      - name: Publicar build para download
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: base-do-suporte-windows
+          include-hidden-files: true
+          path: |
+            dist/
+            src/server/
+            content/
+            scripts/
+            src/client/
+            public/
+            test/
+            package.json
+            package-lock.json
+            *.json
+            *.ts
+            .env.example
+            index.html
+            INICIAR_SITE.cmd
+            INICIAR.bat
+            README.md
