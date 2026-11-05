@@ -56,11 +56,19 @@ function Get-NodeRuntime {
         $archivePath = Join-Path $temporaryDirectory $archiveName
         # Pin the ZIP to the version in the manifest, even if latest changes mid-download.
         Invoke-WebRequest -UseBasicParsing -Uri "https://nodejs.org/dist/$version/$archiveName" -OutFile $archivePath -TimeoutSec 600
-        $actualHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash
+        $hashAlgorithm = [System.Security.Cryptography.SHA256]::Create()
+        $archiveStream = [System.IO.File]::OpenRead($archivePath)
+        try {
+            $actualHash = [BitConverter]::ToString($hashAlgorithm.ComputeHash($archiveStream)).Replace('-', '')
+        } finally {
+            $archiveStream.Dispose()
+            $hashAlgorithm.Dispose()
+        }
         if ($actualHash -ne $release.Groups['hash'].Value) {
             throw 'A verificacao SHA-256 do Node.js falhou. O arquivo nao sera executado; tente novamente.'
         }
-        Expand-Archive -LiteralPath $archivePath -DestinationPath $temporaryDirectory -Force
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        [System.IO.Compression.ZipFile]::ExtractToDirectory($archivePath, $temporaryDirectory)
         $extractedHome = Join-Path $temporaryDirectory ([System.IO.Path]::GetFileNameWithoutExtension($archiveName))
         if (-not (Test-NodeRuntime (Join-Path $extractedHome 'node.exe'))) {
             throw 'O download nao forneceu uma instalacao valida de Node.js 24 e npm.'
