@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { ApiError, formatDate, queryString, request } from "./api";
 import ArticleContent from "./ArticleContent";
@@ -132,11 +132,10 @@ export default function ArticlePage() {
           {sections
             .filter(([id]) => id !== "cuidados" || article.warnings.length > 0)
             .map(([id, label]) => (
-              <a key={id} href={`#${id}`}>
+              <Fragment key={id}><a href={`#${id}`}>
                 {label}
-              </a>
+              </a>{id === "procedimento" && article.procedureSections?.filter(section=>article.procedureSections!.length>1 || section.title.toLowerCase()!=="procedimento").map(section => <a className="kb-toc-child" href={`#secao-${section.id}`} key={section.id}>{section.title}</a>)}</Fragment>
             ))}
-          {article.procedureSections?.map(section => <a className="kb-toc-child" href={`#secao-${section.id}`} key={section.id}>{section.title}</a>)}
         </nav>
         <Link to="/">← Explorar a base</Link>
       </aside>

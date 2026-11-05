@@ -258,11 +258,12 @@ button, a, input, select, textarea, summary { outline-offset: 4px; }
   .kb-article-heading h1 { font-size: 28px; }
   .kb-article-body p, .kb-article-body li { font-size: 14px; }
   .kb-editor-section { padding: 20px; }
+  .kb-editor .kb-page-heading { flex-direction: column; align-items: flex-start; gap: 12px; }
   .kb-field-grid { grid-template-columns: 1fr; gap: 0; }
   .kb-procedure-heading { flex-wrap: wrap; }
   .kb-editor fieldset.kb-procedure-section { padding: 16px; }
   .kb-images-editor { grid-template-columns: 1fr; }
-  .kb-editor-actions { flex-wrap: wrap; gap: 12px; padding: 12px; bottom: 8px; }
+  .kb-editor-actions { position: static; flex-wrap: wrap; gap: 12px; padding: 12px; box-shadow: none; }
   .kb-editor-actions > .kb-actions { flex: 1; justify-content: flex-end; }
   .kb-editor-actions button { font-size: 13px; padding-inline: 11px; }
   .kb-source-row { padding: 16px; }
@@ -271,7 +272,9 @@ button, a, input, select, textarea, summary { outline-offset: 4px; }
   .kb-login { padding: 24px; }
 }
 @media (max-width: 440px) {
-  .kb-header nav { width: 100%; justify-content: space-between; }
+  .kb-header nav { gap: 0; }
+  .kb-header nav a:not(.kb-support-link) { display: none; }
+  .kb-header nav a { display: inline-flex; align-items: center; min-height: 40px; }
   .kb-library-heading { flex-wrap: wrap; }
   .kb-library-heading > .kb-primary { min-height: 40px; }
   .kb-search { gap: 8px; }

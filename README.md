@@ -28,6 +28,8 @@ Os logs ficam em `logs/site.log`, `logs/erros.log` e `logs/gerenciador.log`. Se 
 
 Não há senha padrão. Para configurar o usuário `suporte`, execute `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-windows.ps1 -PasswordHash` na pasta do projeto e copie o hash gerado para `SUPPORT_PASSWORD_HASH` no `.env`. Esse comando também usa o Node.js preparado pelo CMD. O hash fica somente no servidor; senhas não são armazenadas no navegador. A colaboração pública funciona mesmo antes de configurar a administração.
 
+Veja a [revisão da interface, da rede e da execução em segundo plano](docs/REVISAO_INTERFACE_E_REDE.md), com capturas e validação.
+
 ## Funcionalidades
 
 - Consulta, cadastro e edição de publicados sem login geral. Exclusão e restauração somente pelo suporte.
