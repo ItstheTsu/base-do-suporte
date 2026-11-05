@@ -317,7 +317,7 @@ export default function ArticleEditor() {
                 />
               </label>
             ))}
-            <label className="kb-field">
+            {!document.procedureSections?.length && (<label className="kb-field">
               <span>Passos do procedimento</span>
               <textarea
                 required
@@ -329,7 +329,7 @@ export default function ArticleEditor() {
               <small>
                 Um passo por linha. Até 30 passos com 2.000 caracteres cada.
               </small>
-            </label>
+            </label>)}
             <label className="kb-field">
               <span>Como validar</span>
               <textarea
@@ -427,6 +427,7 @@ export default function ArticleEditor() {
               + Adicionar fonte
             </button>
           </section>
+      <ProcedureEditor value={document.procedureSections||[]} steps={document.steps} onBusy={setUploading} onPreview={(id,url)=>setImageSources(old=>({...old,[id]:url}))} onChange={value=>field("procedureSections",value)}/>
         </fieldset>
         {error && (
           <div role="alert" className="kb-error">
@@ -486,7 +487,6 @@ export default function ArticleEditor() {
           </p>
         )}
       </form>
-      <ProcedureEditor value={document.procedureSections||[]} steps={document.steps} onBusy={setUploading} onPreview={(id,url)=>setImageSources(old=>({...old,[id]:url}))} onChange={value=>field("procedureSections",value)}/>
 
       {preview && (
         <section className="kb-preview">
