@@ -15,14 +15,14 @@ A revisão mantém a identidade escura com destaque verde, concentra a primeira 
 | Ações cobrindo campos no celular | Botões acompanham o fluxo do formulário nas telas pequenas. |
 | Endereço inicial em localhost | Inicializador escuta em `0.0.0.0`, abre o IP da rede e gera `ENDERECO_DO_SITE.txt`. |
 | Janela CMD necessária durante o uso | Supervisor oculto, logs e comandos independentes para iniciar e parar. |
-| Risco de encerrar processo errado por PID antigo | Confere pasta, PID, executável e instante de criação; solicita encerramento por canal interno. |
+| Risco de encerrar processo errado por PID antigo | Confere pasta e identificador da instância; solicita encerramento por canal local, sem finalizar outro processo. |
 
 ## Verificação
 
-- 18 testes da API/rede e 13 testes da interface.
+- Testes da API, rede, verificação de prontidão e interface; consulte a execução da revisão para a contagem atual.
 - Build, lint e smoke da aplicação pronta.
 - Windows: CMD fecha, servidor permanece ativo, HTTP responde pelo IP real da interface e repetir o comando não duplica a instância.
-- Windows: download oficial do Node com verificação SHA-256, instalação do zero, caminho com espaços, reinício com cache, preservação de `.env`, parada com liberação da porta e recusa de PID com identidade divergente.
+- Windows: Node LTS, preparação do zero, caminho com espaços e `&`, reinício com cache, preservação de `.env`, parada com liberação da porta e recusa de registro com identidade divergente. A revisão posterior do inicializador está documentada em [REVISAO_INICIALIZADOR.md](REVISAO_INICIALIZADOR.md).
 - Navegador: busca, cópia de link em HTTP, edição de artigo antigo, publicação com JPEG, legenda e associação ao passo.
 - Navegador: lista, filtros e editor em larguras de celular e tablet. Nas verificações em 320, 390 e 768 px o documento não ultrapassou horizontalmente sua área disponível.
 

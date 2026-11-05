@@ -36,6 +36,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        node: [24, 26]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7.0.1
@@ -43,7 +44,7 @@ jobs:
           ref: ${{ needs.lockfile.outputs.revision }}
       - uses: actions/setup-node@v7.1.0
         with:
-          node-version: 24
+          node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci --include=dev
       - run: npm test
@@ -56,7 +57,7 @@ jobs:
         run: ./test/windows-launcher.ps1 -ProjectRoot .
       - run: npm audit --omit=dev
       - name: Publicar build para download
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && matrix.node == 24
         uses: actions/upload-artifact@v7.0.2
         with:
           name: base-do-suporte-windows
@@ -68,7 +69,7 @@ jobs:
             scripts/
             src/client/
             public/
-            test/
+            docs/
             package.json
             package-lock.json
             *.json
@@ -79,16 +80,35 @@ jobs:
             INICIAR.bat
             README.md
   windows-bootstrap:
-    name: CMD oculto instala Node e dependencias do zero
+    name: Preparação visível e servidor em segundo plano
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7.0.1
-      - name: Iniciar sem Node pre-configurado nem dependencias
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 26
+      - name: Iniciar sem dependencias nem build
         shell: pwsh
         run: |
-          $project = Join-Path $env:RUNNER_TEMP "Base do Suporte com espacos"
+          $project = Join-Path $env:RUNNER_TEMP "Base do Suporte & Rotinas"
           $source = Join-Path $env:RUNNER_TEMP "base-source.zip"
           git archive --format=zip --output=$source HEAD
           if ($LASTEXITCODE -ne 0) { throw "Nao foi possivel preparar a copia limpa." }
           Expand-Archive -LiteralPath $source -DestinationPath $project
-          ./test/windows-launcher.ps1 -ProjectRoot $project -Portable
+          ./test/windows-launcher.ps1 -ProjectRoot $project -Clean
+  defender-review:
+    name: Disponibilidade e análise com Defender
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Verificar Defender e analisar os pacotes quando disponível
+        shell: pwsh
+        run: ./test/defender-scan.ps1 -OutputDirectory (Join-Path $env:RUNNER_TEMP "defender-review")
+      - name: Salvar relatório de disponibilidade e análise
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: defender-review
+          path: ${{ runner.temp }}/defender-review/defender-report.json

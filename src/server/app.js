@@ -4,6 +4,7 @@ import { rateLimit } from "express-rate-limit";
 import { z, ZodError } from "zod";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { isIPv4 } from "node:net";
 import {
   articleSchema,
   updateSchema,
@@ -43,7 +44,9 @@ export function createApp({ store, config }) {
           : ["http://localhost:5173", "http://127.0.0.1:5173"]),
       ];
       const developmentOrigin = config.development && req.get("origin") && new URL(req.get("origin")).host === req.get("host");
-      if (req.get("origin") && !allowed.includes(req.get("origin")) && !developmentOrigin)
+      const socketAddress = req.socket.localAddress?.replace(/^::ffff:/, "");
+      const socketOrigin = !config.secureCookies && isIPv4(socketAddress||"") ? `http://${socketAddress}:${req.socket.localPort}` : "";
+      if (req.get("origin") && !allowed.includes(req.get("origin")) && req.get("origin") !== socketOrigin && !developmentOrigin)
         return next(httpError(403, "Origem não permitida."));
       const imageUpload = req.method === "POST" && req.path === "/uploads" && (req.is("image/png") || req.is("image/jpeg"));
       if (!imageUpload && !req.is("application/json"))
@@ -67,7 +70,7 @@ export function createApp({ store, config }) {
     res.set("Cache-Control","private, max-age=60").type(image.mime).send(Buffer.from(image.content));
   });
   app.get("/api/health", (_req, res) =>
-    res.json({ status: "ok", service: "base-do-suporte" }),
+    res.json({ status: "ok", service: "base-do-suporte", ...(/^[a-f0-9-]{36}$/i.test(config.instanceId||"")?{instanceId:config.instanceId}:{}) }),
   );
   app.get("/api/session", (req, res) =>
     res.json({

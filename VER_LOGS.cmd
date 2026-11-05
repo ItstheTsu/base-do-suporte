@@ -1,5 +1,8 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
 cd /d "%~dp0"
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0scripts\manage-windows.ps1" -Action Logs
-exit /b %errorlevel%
+if exist "%~dp0logs\preparacao.log" start "" notepad.exe "%~dp0logs\preparacao.log"
+if exist "%~dp0logs\site.log" start "" notepad.exe "%~dp0logs\site.log"
+if exist "%~dp0logs\erros.log" start "" notepad.exe "%~dp0logs\erros.log"
+if exist "%~dp0logs\gerenciador.log" start "" notepad.exe "%~dp0logs\gerenciador.log"
+exit /b 0
