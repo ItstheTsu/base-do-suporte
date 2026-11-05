@@ -1,10 +1,11 @@
-import { existsSync,readFileSync,writeFileSync,mkdirSync,copyFileSync,readdirSync } from "node:fs";
-import { createHash } from "node:crypto";
+import { existsSync,readFileSync,writeFileSync,mkdirSync,copyFileSync,readdirSync,unlinkSync } from "node:fs";
+import { createHash,randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { resolve,join } from "node:path";
 import { spawn,spawnSync } from "node:child_process";
 import { createServer } from "node:net";
 import { loadEnvFile } from "node:process";
+import { accessAddresses } from "../src/server/network.js";
 const root=fileURLToPath(new URL("../",import.meta.url));
 process.chdir(root);
 const cache=join(root,".cache");
@@ -42,7 +43,11 @@ try{
  if(Number(process.versions.node.split(".")[0])!==24)throw new Error("Instale o Node.js 24 para iniciar.");
  if(!existsSync(".env"))copyFileSync(".env.example",".env");
  loadEnvFile(".env");
- const port=Number(process.env.PORT||1992),host=process.env.HOST||"0.0.0.0";
+ const port=Number(process.env.PORT||1992),host="0.0.0.0";
+ // O inicializador do Windows publica na rede, inclusive com .env antigo em loopback.
+ process.env.HOST=host;
+ const addresses=accessAddresses(port,process.env.PUBLIC_ORIGIN);
+ if(process.env.COOKIE_SECURE!=="true")process.env.PUBLIC_ORIGIN=addresses.preferred;
  await available(port,host);
  mkdirSync(cache,{recursive:true});
  const installHash=createHash("sha256").update(readFileSync("package-lock.json")).update(readFileSync("package.json")).update(process.platform+process.arch+process.versions.modules).digest("hex");
@@ -62,15 +67,27 @@ try{
  console.log("[3/4] Preparando o conteúdo inicial...");
  if(!npm(["run","seed"]))throw new Error("Não foi possível preparar o conteúdo.");
  console.log("[4/4] Iniciando a Base do Suporte...");
- const child=spawn(process.execPath,["--env-file-if-exists=.env","src/server/server.js"],{cwd:root,stdio:"inherit"});
+ const child=spawn(process.execPath,["--env-file-if-exists=.env","src/server/server.js"],{cwd:root,stdio:["inherit","inherit","inherit","ipc"]});
  const exited=new Promise((resolve,reject)=>{child.once("error",reject);child.once("exit",(code,signal)=>resolve({code,signal}));});
  for(const signal of ["SIGINT","SIGTERM"])process.once(signal,()=>{if(!child.killed)child.kill(signal);});
  try{
   await healthy(port,child);
   const url=process.env.PUBLIC_ORIGIN||"http://localhost:"+port;
+  const instance=randomUUID();
+  writeFileSync(join(cache,"ready.json"),JSON.stringify({pid:process.pid,instance,port,url,local:addresses.local,network:addresses.network,startedAt:new Date().toISOString()}));
+  writeFileSync(join(root,"ENDERECO_DO_SITE.txt"),["Base do Suporte", "Acesso: "+url,"Neste computador: "+addresses.local,...addresses.network.map(address=>"Na rede: "+address),"Para encerrar: PARAR_SITE.cmd"].join("\r\n"));
+  const stopFile=join(cache,"stop.json");
+  const stopTimer=setInterval(()=>{
+   try{const stop=JSON.parse(readFileSync(stopFile,"utf8"));if(stop.pid===process.pid&&stop.instance===instance&&child.connected){child.send({type:"shutdown"});unlinkSync(stopFile);}}catch{}
+  },500);
+  stopTimer.unref();
   console.log("Acesse "+url+" | Administração: /admin");
-  console.log("Mantenha a janela aberta. Para encerrar, pressione Ctrl+C.");
+  console.log("Neste computador: "+addresses.local);
+  for(const address of addresses.network)console.log("Na rede: "+address);
+  console.log(process.env.BASE_BACKGROUND==="1"?"Servidor em segundo plano. Para encerrar, execute PARAR_SITE.cmd.":"Para encerrar, pressione Ctrl+C.");
   if(!process.argv.includes("--no-open")&&process.env.BASE_NO_OPEN!=="1")openBrowser(url);
   const result=await exited;process.exitCode=result.code??0;
+  clearInterval(stopTimer);
+  try{if(JSON.parse(readFileSync(join(cache,"ready.json"),"utf8")).pid===process.pid)unlinkSync(join(cache,"ready.json"));}catch{}
  }catch(error){if(!child.killed)child.kill();throw error;}
 }catch(error){console.error("\nERRO: "+error.message);process.exitCode=1;}

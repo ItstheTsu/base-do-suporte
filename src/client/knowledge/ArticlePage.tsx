@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router";
 import { ApiError, formatDate, queryString, request } from "./api";
 import ArticleContent from "./ArticleContent";
 import { sections } from "./article-sections";
+import { copyLink } from "./clipboard";
+import Icon from "./Icon";
 import type { Article, ArticleSummary, ArticlePage as Page } from "./types";
 
 export default function ArticlePage() {
@@ -12,6 +14,7 @@ export default function ArticlePage() {
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
   const [copied, setCopied] = useState("");
+  const [showCopy, setShowCopy] = useState(false);
   useEffect(() => {
     const abort = new AbortController();
     setArticle(null);
@@ -19,6 +22,7 @@ export default function ArticlePage() {
     setError("");
     setNotFound(false);
     setCopied("");
+    setShowCopy(false);
     request<Article>(`/articles/${encodeURIComponent(slug ?? "")}`, {
       signal: abort.signal,
     })
@@ -45,12 +49,9 @@ export default function ArticlePage() {
     };
   }, [slug]);
   async function share() {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied("Link copiado.");
-    } catch {
-      setCopied("Copie o endereço desta página para compartilhar.");
-    }
+    const success = await copyLink(window.location.href);
+    setCopied(success ? "Link copiado." : "Selecione e copie o endereço abaixo.");
+    setShowCopy(!success);
   }
   if (!article)
     return (
@@ -92,16 +93,17 @@ export default function ArticlePage() {
           </div>
           <div className="kb-article-tools">
             <button className="kb-secondary" onClick={share}>
-              Copiar link ↗
+              <Icon name="link" size={16} /> Copiar link
             </button>
             <Link
               className="kb-secondary"
               to={`/artigos/${article.slug}/editar`}
             >
-              Editar artigo
+              <Icon name="edit" size={16} /> Editar artigo
             </Link>
             <span role="status">{copied}</span>
           </div>
+          {showCopy && <label className="kb-field kb-copy-field"><span>Link deste artigo</span><input readOnly value={window.location.href} onFocus={e=>e.target.select()} autoFocus /></label>}
         </div>
         <ArticleContent article={article} />
         <div className="kb-article-tags">
@@ -126,6 +128,7 @@ export default function ArticlePage() {
       <aside className="kb-toc" aria-label="Nesta página">
         <span className="kb-eyebrow">NESTE ARTIGO</span>
         <nav>
+          {article.errorMessage && <a href="#mensagem">Mensagem apresentada</a>}
           {sections
             .filter(([id]) => id !== "cuidados" || article.warnings.length > 0)
             .map(([id, label]) => (
@@ -133,6 +136,7 @@ export default function ArticlePage() {
                 {label}
               </a>
             ))}
+          {article.procedureSections?.map(section => <a className="kb-toc-child" href={`#secao-${section.id}`} key={section.id}>{section.title}</a>)}
         </nav>
         <Link to="/">← Explorar a base</Link>
       </aside>

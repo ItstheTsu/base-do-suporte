@@ -10,6 +10,7 @@ import { lazy, Suspense, useEffect } from "react";
 import { SupportSession } from "./Session";
 import { useSupport } from "./session-context";
 import Catalog from "./Catalog";
+import Icon from "./Icon";
 const ArticlePage = lazy(() => import("./ArticlePage"));
 const SupportPage = lazy(() => import("./SupportPage"));
 const ArticleEditor = lazy(() => import("./ArticleEditor"));
@@ -33,25 +34,16 @@ function Shell() {
             aria-label="Base do Suporte — início"
           >
             <span className="kb-logo" aria-hidden="true">
-              b<span>.</span>
+              <Icon name="book" size={22} />
             </span>
-            <span>
-              Base do Suporte<small>Conhecimento que resolve.</small>
-            </span>
+            <span>Base do Suporte</span>
           </Link>
           <nav aria-label="Navegação principal">
             <NavLink to="/" end>
               Artigos
             </NavLink>
-            <a
-              href="https://www.vsm.com.br/areadocliente/baseConhecimento"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Base VSM ↗
-            </a>
             <NavLink className="kb-support-link" to="/admin">
-              {user ? "Administrar artigos" : "Área administrativa"}
+              {user ? "Gerenciar artigos" : "Administração"}
             </NavLink>
           </nav>
         </div>
@@ -79,11 +71,8 @@ function Shell() {
       </main>
       <footer className="kb-footer">
         <div className="kb-container">
-          <span>
-            Base do Suporte <span className="kb-dot">•</span> Rotinas, erros e
-            soluções.
-          </span>
-          <span>Conteúdo com fontes e contexto de aplicação.</span>
+          <span>Base do Suporte · Conhecimento da equipe.</span>
+          <a href="https://www.vsm.com.br/areadocliente/baseConhecimento" target="_blank" rel="noreferrer">Consultar a Base VSM <Icon name="external" size={14} /></a>
         </div>
       </footer>
     </div>

@@ -1,0 +1,23 @@
+import { createServer } from "node:http";
+import { createServer as createViteServer } from "vite";
+import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
+import { parseArgs } from "node:util";
+import { openStore } from "../src/server/store.js";
+import { seed } from "../src/server/seed.js";
+import { createApp } from "../src/server/app.js";
+import { accessAddresses } from "../src/server/network.js";
+
+const root=fileURLToPath(new URL("../",import.meta.url));
+process.chdir(root);
+const {values}=parseArgs({options:{port:{type:"string"},host:{type:"string"},strictPort:{type:"boolean"}}});
+const port=Number(values.port||process.env.PORT||1992);
+const store=openStore(resolve(root,"data/development.sqlite"));
+seed(store);
+const addresses=accessAddresses(port,process.env.PUBLIC_ORIGIN);
+const app=createApp({store,config:{development:true,production:false,secureCookies:false,username:"suporte",passwordHash:"",publicOrigin:addresses.preferred,allowedOrigins:addresses.allowedOrigins}});
+const server=createServer(app);
+const vite=await createViteServer({server:{middlewareMode:true,ws:{server},proxy:{},allowedHosts:["terminal.local"]},appType:"spa"});
+app.use(vite.middlewares);
+server.listen(port,"0.0.0.0",()=>console.log("Local: http://localhost:"+port));
+for(const signal of ["SIGINT","SIGTERM"])process.once(signal,async()=>{await vite.close();server.closeAllConnections();server.close(()=>{store.close();process.exit(0);});});

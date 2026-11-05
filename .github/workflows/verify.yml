@@ -53,32 +53,7 @@ jobs:
       - name: Verificar CMD no Windows
         if: runner.os == 'Windows'
         shell: pwsh
-        run: |
-          $env:PORT = "21992"
-          $env:PUBLIC_ORIGIN = "http://localhost:21992"
-          $env:DATABASE_PATH = Join-Path $env:RUNNER_TEMP "base-launch-test.sqlite"
-          $env:BASE_NO_OPEN = "1"
-          $env:BASE_NO_PAUSE = "1"
-          $out = Join-Path $env:RUNNER_TEMP "base-launch-out.log"
-          $err = Join-Path $env:RUNNER_TEMP "base-launch-err.log"
-          $launcher = Start-Process -FilePath "cmd.exe" -ArgumentList "/d", "/c", "INICIAR_SITE.cmd" -PassThru -NoNewWindow -RedirectStandardOutput $out -RedirectStandardError $err
-          try {
-            $ready = $false
-            for ($attempt = 0; $attempt -lt 120; $attempt++) {
-              if ($launcher.HasExited) { throw "O CMD encerrou antes de iniciar o site." }
-              try {
-                $health = Invoke-RestMethod "http://127.0.0.1:21992/api/health" -TimeoutSec 1
-                if ($health.service -eq "base-do-suporte") { $ready = $true; break }
-              } catch {}
-              Start-Sleep -Seconds 2
-            }
-            if (-not $ready) { throw "O CMD nao iniciou o site no prazo." }
-            Write-Host "CMD validado: servidor respondeu na porta 21992."
-          } finally {
-            if (-not $launcher.HasExited) { taskkill /PID $launcher.Id /T /F | Out-Null }
-            if (Test-Path $out) { Get-Content $out }
-            if (Test-Path $err) { Get-Content $err }
-          }
+        run: ./test/windows-launcher.ps1 -ProjectRoot .
       - run: npm audit --omit=dev
       - name: Publicar build para download
         if: runner.os == 'Windows'
@@ -100,11 +75,11 @@ jobs:
             *.ts
             .env.example
             index.html
-            INICIAR_SITE.cmd
+            *.cmd
             INICIAR.bat
             README.md
   windows-bootstrap:
-    name: CMD instala Node e dependencias do zero
+    name: CMD oculto instala Node e dependencias do zero
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7.0.1
@@ -116,46 +91,4 @@ jobs:
           git archive --format=zip --output=$source HEAD
           if ($LASTEXITCODE -ne 0) { throw "Nao foi possivel preparar a copia limpa." }
           Expand-Archive -LiteralPath $source -DestinationPath $project
-          $env:BASE_FORCE_PORTABLE_NODE = "1"
-          $env:BASE_RUNTIME_DIR = Join-Path $env:RUNNER_TEMP "Runtime do usuario"
-          $env:BASE_NO_OPEN = "1"
-          $env:BASE_NO_PAUSE = "1"
-          $env:PORT = "22992"
-          $env:PUBLIC_ORIGIN = "http://localhost:22992"
-          $env:DATABASE_PATH = Join-Path $env:RUNNER_TEMP "base-bootstrap.sqlite"
-          $stamps = @(".cache/dependencies.sha256", ".cache/frontend.sha256")
-          $firstStamps = @{}
-          for ($round = 1; $round -le 2; $round++) {
-            $out = Join-Path $env:RUNNER_TEMP "base-bootstrap-$round-out.log"
-            $err = Join-Path $env:RUNNER_TEMP "base-bootstrap-$round-err.log"
-            $launcher = Start-Process -FilePath "cmd.exe" -ArgumentList "/d", "/c", "INICIAR_SITE.cmd" -WorkingDirectory $project -PassThru -NoNewWindow -RedirectStandardOutput $out -RedirectStandardError $err
-            try {
-              $ready = $false
-              for ($attempt = 0; $attempt -lt 240; $attempt++) {
-                if ($launcher.HasExited) { throw "O CMD encerrou antes de iniciar o site." }
-                try {
-                  $health = Invoke-RestMethod "http://127.0.0.1:22992/api/health" -TimeoutSec 1
-                  if ($health.service -eq "base-do-suporte") { $ready = $true; break }
-                } catch {}
-                Start-Sleep -Seconds 2
-              }
-              if (-not $ready) { throw "O CMD nao iniciou o site no prazo." }
-              foreach ($required in @("node_modules", "dist/index.html", ".env")) {
-                if (-not (Test-Path -LiteralPath (Join-Path $project $required))) { throw "O CMD nao preparou $required." }
-              }
-              foreach ($stamp in $stamps) {
-                $file = Get-Item -LiteralPath (Join-Path $project $stamp)
-                if ($round -eq 1) { $firstStamps[$stamp] = $file.LastWriteTimeUtc }
-                elseif ($file.LastWriteTimeUtc -ne $firstStamps[$stamp]) { throw "A segunda inicializacao refez $stamp sem necessidade." }
-              }
-              $log = Get-Content -LiteralPath $out -Raw
-              if ($round -eq 1 -and $log -notmatch "Baixando Node.js 24") { throw "O teste nao percorreu a instalacao automatica do Node.js." }
-              if ($round -eq 2 -and $log -match "Baixando Node.js 24") { throw "O CMD baixou o Node.js novamente sem necessidade." }
-              Write-Host "CMD validado: rodada $round com instalacao por usuario e dependencias automaticas."
-            } finally {
-              if (-not $launcher.HasExited) { taskkill /PID $launcher.Id /T /F | Out-Null }
-              if (Test-Path $out) { Get-Content $out }
-              if (Test-Path $err) { Get-Content $err }
-            }
-          }
-
+          ./test/windows-launcher.ps1 -ProjectRoot $project -Portable

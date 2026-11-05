@@ -22,7 +22,7 @@ export function createApp({ store, config }) {
   app.use(
     helmet({
       strictTransportSecurity: config.secureCookies ? undefined : false,
-      contentSecurityPolicy: {
+      contentSecurityPolicy: config.development ? false : {
         directives: {
           upgradeInsecureRequests: config.secureCookies ? [] : null,
         },
@@ -42,7 +42,8 @@ export function createApp({ store, config }) {
           ? []
           : ["http://localhost:5173", "http://127.0.0.1:5173"]),
       ];
-      if (req.get("origin") && !allowed.includes(req.get("origin")))
+      const developmentOrigin = config.development && req.get("origin") && new URL(req.get("origin")).host === req.get("host");
+      if (req.get("origin") && !allowed.includes(req.get("origin")) && !developmentOrigin)
         return next(httpError(403, "Origem não permitida."));
       const imageUpload = req.method === "POST" && req.path === "/uploads" && (req.is("image/png") || req.is("image/jpeg"));
       if (!imageUpload && !req.is("application/json"))

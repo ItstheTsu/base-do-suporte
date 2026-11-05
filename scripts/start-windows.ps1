@@ -100,8 +100,15 @@ try {
         Write-Host 'Preparando dependencias e iniciando a Base do Suporte...'
         & $nodePath (Join-Path $PSScriptRoot 'launch.mjs')
     }
-    exit $LASTEXITCODE
+    $result = $LASTEXITCODE
+    if ($result -ne 0 -and $env:BASE_BACKGROUND -eq '1' -and $env:BASE_NO_OPEN -ne '1') {
+        Start-Process -FilePath 'notepad.exe' -ArgumentList ('"' + (Join-Path $projectRoot 'logs\erros.log') + '"') | Out-Null
+    }
+    exit $result
 } catch {
     [Console]::Error.WriteLine(('ERRO: ' + $_.Exception.Message))
+    if ($env:BASE_BACKGROUND -eq '1' -and $env:BASE_NO_OPEN -ne '1') {
+        Start-Process -FilePath 'notepad.exe' -ArgumentList ('"' + (Join-Path $projectRoot 'logs\erros.log') + '"') | Out-Null
+    }
     exit 1
 }

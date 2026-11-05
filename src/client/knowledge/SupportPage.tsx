@@ -161,7 +161,7 @@ export default function SupportPage() {
         <section className="kb-login">
           <div className="kb-eyebrow">GESTÃO DE CONTEÚDO</div>
           <h1>Área do suporte</h1>
-          <p>Entre para criar, revisar e publicar artigos.</p>
+          <p>Entre para gerenciar rascunhos, exclusões e restaurações.</p>
           <form onSubmit={login}>
             <label className="kb-field">
               <span>Usuário</span>

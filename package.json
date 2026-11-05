@@ -10,9 +10,9 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env src/server/server.js",
     "iniciar": "node scripts/launch.mjs",
-    "dev": "vite",
+    "dev": "node scripts/dev.mjs",
     "build": "tsc -b && vite build",
-    "test:api": "node --test test/api.test.js",
+    "test:api": "node --test test/*.test.js",
     "test:ui": "vitest run",
     "test": "npm run test:api && npm run test:ui",
     "lint": "oxlint src/client test/ui",

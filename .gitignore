@@ -6,5 +6,6 @@ data/
 .env.*
 !.env.example
 *.log
+ENDERECO_DO_SITE.txt
 *.tsbuildinfo
 .DS_Store
