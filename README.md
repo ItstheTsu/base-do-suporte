@@ -40,7 +40,7 @@ Veja a [revisão da interface, da rede e da execução em segundo plano](docs/RE
 
 - Consulta, cadastro e edição de publicados sem login geral. Exclusão e restauração somente pelo suporte.
 - Busca sem distinção de acentos/caixa, prefixos e relevância, com filtros de produto, categoria, seção e tags.
-- Artigos com mensagem de erro, sintomas, causa, validação, cuidados e fontes.
+- Artigos com mensagem de erro, sintomas, causa, validação, cuidados e referências opcionais. É possível publicar sem fontes; quando informadas, precisam de nome e link público HTTPS.
 - Procedimentos com várias seções, passos, prints PNG/JPG, legendas e vinculação da imagem ao passo.
 - Envio de prints por arquivo ou Ctrl+V. Até 5 MB por imagem e 10 imagens por seção; imagens grandes são reduzidas quando isso diminui o tamanho.
 - Distinção entre consulta e alteração direta no banco, com marcação independente de N2 / Supervisor.

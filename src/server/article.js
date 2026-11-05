@@ -9,6 +9,7 @@ const source = z
       .url()
       .max(1000)
       .refine((value) => {
+        if (!URL.canParse(value)) return false;
         const url = new URL(value);
         return (
           url.protocol === "https:" &&
@@ -55,7 +56,7 @@ export const articleSchema = z
     steps: lines().min(1),
     validation: text(10, 5000),
     warnings: lines(10),
-    sources: z.array(source).min(1).max(10),
+    sources: z.array(source).max(10).default([]),
     status: z.enum(["draft", "published"]),
     requiresDatabaseChange: z.boolean().default(false),
     databaseMode: z.enum(["none","read","write"]).default("none"),

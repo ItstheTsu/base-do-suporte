@@ -130,7 +130,7 @@ export default function ArticlePage() {
         <nav>
           {article.errorMessage && <a href="#mensagem">Mensagem apresentada</a>}
           {sections
-            .filter(([id]) => id !== "cuidados" || article.warnings.length > 0)
+            .filter(([id]) => (id !== "cuidados" || article.warnings.length > 0) && (id !== "fontes" || article.sources.length > 0))
             .map(([id, label]) => (
               <Fragment key={id}><a href={`#${id}`}>
                 {label}

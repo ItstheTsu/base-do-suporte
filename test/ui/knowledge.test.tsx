@@ -165,6 +165,50 @@ describe("consulta pública", () => {
 });
 
 describe("editor e conteúdo", () => {
+  it("permite publicar após remover a última referência ou deixar uma linha vazia", async () => {
+    let saved: any;
+    vi.stubGlobal("fetch", vi.fn(async (_path: string, options: RequestInit) => {
+      if (options.method === "PATCH") {
+        saved = JSON.parse(options.body as string);
+        return json({ ...article, ...saved, version: 2 });
+      }
+      return json(article);
+    }));
+    render(<SessionContext.Provider value={{ ...session, user: null }}>
+      <MemoryRouter initialEntries={["/artigos/conferir-lote/editar"]}>
+        <Routes><Route path="/artigos/:slug/editar" element={<ArticleEditor />} /></Routes>
+      </MemoryRouter>
+    </SessionContext.Provider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "Remover fonte 1" }));
+    expect(screen.queryByLabelText("Nome da fonte 1")).toBeNull();
+    expect(screen.getByText(/As referências não são obrigatórias/)).toBeDefined();
+    await user.click(screen.getByRole("button", { name: "+ Adicionar fonte" }));
+    const title = screen.getByLabelText("Nome da fonte 1") as HTMLInputElement;
+    const url = screen.getByLabelText("Link da fonte 1") as HTMLInputElement;
+    expect(title.required).toBe(false);
+    expect(url.required).toBe(false);
+    await user.type(title, "Fonte opcional");
+    expect(url.required).toBe(true);
+    await user.clear(title);
+    await user.click(screen.getByRole("button", { name: "Salvar publicação" }));
+    await screen.findByText("Artigo publicado. A leitura pública já está disponível.");
+    expect(saved.sources).toEqual([]);
+  });
+
+  it("oculta a seção e o link do índice quando não há referências", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (path: string) => path.includes("/articles?")
+      ? json({ items: [], total: 0, page: 1, limit: 12 })
+      : json({ ...article, sources: [] })));
+    const { container } = render(<MemoryRouter initialEntries={["/artigos/conferir-lote"]}>
+      <Routes><Route path="/artigos/:slug" element={<ArticlePage />} /></Routes>
+    </MemoryRouter>);
+    await screen.findByRole("heading", { name: article.title });
+    expect(screen.queryByRole("heading", { name: "Fontes e referências" })).toBeNull();
+    expect(container.querySelector('a[href="#fontes"]')).toBeNull();
+    expect(screen.getByRole("link", { name: "Como validar", exact: true })).toBeDefined();
+  });
+
   it("preserva o texto após conflito de versão, sem sobrescrever a edição do servidor", async () => {
     const writes: RequestInit[] = [];
     vi.stubGlobal(

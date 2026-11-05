@@ -75,6 +75,31 @@ const document = (slug = "novo-artigo") => ({
   status: "draft",
 });
 
+test("referências são opcionais na publicação e podem ser removidas na edição", async t => {
+  const { call } = await fixture(t);
+  for (const explicit of [false, true]) {
+    const body = { ...document(`sem-fontes-${explicit}`), status: "published" };
+    if (explicit) body.sources = [];
+    else delete body.sources;
+    const response = await call("/articles", { method: "POST", body });
+    assert.equal(response.status, 201);
+    assert.deepEqual((await response.json()).sources, []);
+    assert.deepEqual((await (await call(`/articles/${body.slug}`)).json()).sources, []);
+  }
+  const body = { ...document("remover-referencia"), status: "published" };
+  const created = await (await call("/articles", { method: "POST", body })).json();
+  const updated = await call(`/articles/${created.id}`, {
+    method: "PATCH", body: { ...body, sources: [], version: created.version },
+  });
+  assert.equal(updated.status, 200);
+  assert.deepEqual((await (await call(`/articles/${body.slug}`)).json()).sources, []);
+  for (const source of [{ title: "Fonte sem link", url: "" }, { title: "", url: "https://example.com" }]) {
+    assert.equal((await call("/articles", {
+      method: "POST", body: { ...body, slug: "fonte-incompleta", sources: [source] },
+    })).status, 422);
+  }
+});
+
 test("a origem do IP que recebeu a conexão funciona mesmo sem descoberta de adaptadores", async t => {
   const {call}=await fixture(t,{production:true,publicOrigin:"http://localhost:1992",allowedOrigins:[]});
   const health=await call("/health");

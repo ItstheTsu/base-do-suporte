@@ -26,7 +26,7 @@ const blank: ArticleDocument = {
   steps: [""],
   validation: "",
   warnings: [],
-  sources: [{ title: "", url: "" }],
+  sources: [],
   status: "draft",
   databaseMode: "none",
   requiresEscalation: false,
@@ -123,6 +123,7 @@ export default function ArticleEditor() {
       .submitter as HTMLButtonElement | null;
     const content: ArticleDocument = {
       ...document,
+      sources: document.sources.filter(source => source.title.trim() || source.url.trim()),
       requiresDatabaseChange:document.databaseMode==="write" || (!document.databaseMode && Boolean(document.requiresDatabaseChange)),
       procedureSections:(document.procedureSections||[]).map(section=>({...section,steps:section.steps.map(step=>step.trim()).filter(Boolean)})),
       status:
@@ -356,17 +357,17 @@ export default function ArticleEditor() {
             </details>
           </section>
           <section className="kb-editor-section">
-            <h2>5. Referências</h2>
+            <h2>5. Referências (opcional)</h2>
             <p>
-              Use endereços públicos, sem senha ou token. Ao menos uma fonte é
-              obrigatória.
+              As referências não são obrigatórias. Se adicionar uma fonte, informe
+              o nome e um endereço público HTTPS, sem senha ou token.
             </p>
             {document.sources.map((source, index) => (
               <div className="kb-source-row" key={index}>
                 <label className="kb-field">
                   <span>Nome da fonte {index + 1}</span>
                   <input
-                    required
+                    required={Boolean(source.url.trim())}
                     minLength={3}
                     maxLength={180}
                     value={source.title}
@@ -385,7 +386,7 @@ export default function ArticleEditor() {
                 <label className="kb-field">
                   <span>Link da fonte {index + 1}</span>
                   <input
-                    required
+                    required={Boolean(source.title.trim())}
                     type="url"
                     maxLength={1000}
                     placeholder="https://"
@@ -400,7 +401,6 @@ export default function ArticleEditor() {
                     }
                   />
                 </label>
-                {document.sources.length > 1 && (
                   <button
                     type="button"
                     className="kb-text-button"
@@ -413,7 +413,6 @@ export default function ArticleEditor() {
                   >
                     Remover fonte {index + 1}
                   </button>
-                )}
               </div>
             ))}
             <button
