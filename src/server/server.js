@@ -13,7 +13,7 @@ if(publicOrigin!==origin.origin||!["http:","https:"].includes(origin.protocol)||
 const addresses=accessAddresses(port,publicOrigin);
 const allowedOrigins=secureCookies?[publicOrigin]:addresses.allowedOrigins;
 const store=openStore(resolve(ROOT,process.env.DATABASE_PATH||"./data/knowledge.sqlite"));
-const app=createApp({store,config:{production,secureCookies,publicOrigin,allowedOrigins,username:process.env.SUPPORT_USERNAME||"suporte",passwordHash:process.env.SUPPORT_PASSWORD_HASH||"",frontendDist:resolve(ROOT,process.env.FRONTEND_DIST||"dist")}});
+const app=createApp({store,config:{production,secureCookies,publicOrigin,allowedOrigins,instanceId:process.env.BASE_LAUNCH_ID,username:process.env.SUPPORT_USERNAME||"suporte",passwordHash:process.env.SUPPORT_PASSWORD_HASH||"",frontendDist:resolve(ROOT,process.env.FRONTEND_DIST||"dist")}});
 const server=app.listen(port,process.env.HOST||"0.0.0.0",()=>{
  console.log("Base do Suporte: "+publicOrigin);
  console.log("Neste computador: "+addresses.local);
@@ -27,3 +27,4 @@ function shutdown(){
 }
 for(const signal of ["SIGINT","SIGTERM"])process.on(signal,shutdown);
 process.on("message",message=>{if(process.send&&message?.type==="shutdown")shutdown();});
+process.on("disconnect",shutdown);

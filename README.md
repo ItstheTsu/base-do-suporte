@@ -7,26 +7,32 @@ Aplicação unificada de conhecimento para rotinas de suporte: **React + TypeScr
 1. Baixe ou clone este repositório e extraia **todos os arquivos** em uma pasta.
 2. Dê dois cliques em **INICIAR_SITE.cmd**, na raiz do projeto.
 
-Não é necessário instalar Node.js ou executar npm manualmente. Se não encontrar Node.js 24 com npm, o CMD baixa a distribuição oficial para Windows x64/ARM64, verifica o SHA-256 e a prepara em `%LOCALAPPDATA%\BaseDoSuporte\runtime`. Essa preparação não exige administrador nem altera o PATH permanente do Windows.
+O CMD usa Node.js **24 ou 26 LTS com npm** já instalado; se não encontrar uma versão compatível, solicita a instalação oficial pelo WinGet (`OpenJS.NodeJS.LTS`, fonte `winget`). O instalador do Windows pode pedir elevação. Se o WinGet não estiver disponível, o CMD informa o endereço oficial para instalar Node.js com npm. Uma instalação portátil oficial preparada por uma versão anterior pode ser reaproveitada.
 
-O CMD fecha a janela automaticamente e prepara a aplicação em **segundo plano**: verifica a porta, instala dependências, compila o site e abre o navegador depois de confirmar que o servidor respondeu. Na primeira execução, aguarde o download do Node e dos pacotes; as seguintes reaproveitam a instalação e o build válidos. Não é necessário manter uma janela CMD aberta.
+A preparação fica **visível**: instalação dos pacotes, compilação e conteúdo inicial. Depois disso, somente o servidor entra em segundo plano; o navegador abre quando a API confirma que está pronta, e a janela CMD fecha. As próximas execuções reutilizam as dependências e o build válidos.
+
+O inicializador não executa arquivos PowerShell, não altera políticas de execução e não modifica configurações do antivírus. Isso não constitui uma garantia de classificação pelo Defender. Veja a [revisão do alerta e das falhas de inicialização](docs/REVISAO_INICIALIZADOR.md).
+
 
 | Arquivo | Ação |
 | --- | --- |
 | `INICIAR_SITE.cmd` | Prepara e inicia; se a mesma instância já estiver ativa, abre o site sem duplicar o servidor. |
 | `PARAR_SITE.cmd` | Encerra a instância desta pasta e libera a porta. |
-| `VER_LOGS.cmd` | Abre os registros de inicialização e erros. |
+| `VER_LOGS.cmd` | Abre os registros de preparação, servidor e erros. |
+| `INICIAR_DEBUG.cmd` | Executa em primeiro plano para diagnóstico. |
 | `ENDERECO_DO_SITE.txt` | Gerado após iniciar, com os endereços do computador e da rede. |
-| `LIBERAR_REDE.cmd` | Se necessário, cria uma regra de Firewall do Windows para TCP 1992, limitada à sub-rede local nos perfis Privado e Domínio; solicita elevação do Windows. |
+| `LIBERAR_REDE.cmd` | Se necessário, cria uma regra de Firewall do Windows para TCP 1992, limitada à sub-rede local nos perfis Privado e Domínio; execute como administrador quando necessário. |
 
 O site escuta em **`0.0.0.0:1992`**. O navegador abre o IP detectado da rede, por exemplo `http://172.20.80.35:1992/`; o endereço do seu computador pode ser diferente e fica no arquivo de endereços. O acesso local `http://localhost:1992/` também funciona. A API, os artigos e as imagens usam a mesma origem, inclusive ao cadastrar e editar por IP. Para outros computadores acessarem, eles devem alcançar esse computador na rede e o firewall deve permitir a porta.
 
 O `.env` existente e os dados são preservados. O inicializador ativa `HOST=0.0.0.0` no processo, mesmo quando um `.env` anterior aponta para loopback; a porta padrão continua 1992 (`PORT` pode ser configurada). Administração em `/admin`. Para um DNS específico, configure `PUBLIC_ORIGIN` no `.env`. Para HTTPS, configure a origem HTTPS e `COOKIE_SECURE=true`.
 
-Os logs ficam em `logs/site.log`, `logs/erros.log` e `logs/gerenciador.log`. Se a preparação falhar, o registro de erro abre automaticamente. O processo continua depois de fechar o navegador; use `PARAR_SITE.cmd` antes de atualizar os arquivos. O comando de parar verifica PID, instante de criação e pasta da instância e solicita o encerramento do servidor; só usa finalização forçada da própria árvore se ela não responder. Não há instalação de serviço nem inicialização automática ao ligar o Windows.
+Os logs ficam em `logs/preparacao.log`, `logs/site.log`, `logs/erros.log` e `logs/gerenciador.log`. Se houver falha, o CMD permanece aberto com o erro. A verificação aguarda até 90 segundos e informa a URL testada, a última resposta e saídas antecipadas do processo. O diagnóstico local usa HTTP direto em loopback para não depender do proxy da rede.
+
+O processo continua depois de fechar o navegador; use `PARAR_SITE.cmd` antes de atualizar. O comando de parar verifica o identificador da instância e solicita seu encerramento pelo canal local do aplicativo; não executa finalização de outros processos nem instala serviço ou inicialização automática ao ligar o Windows.
 
 
-Não há senha padrão. Para configurar o usuário `suporte`, execute `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-windows.ps1 -PasswordHash` na pasta do projeto e copie o hash gerado para `SUPPORT_PASSWORD_HASH` no `.env`. Esse comando também usa o Node.js preparado pelo CMD. O hash fica somente no servidor; senhas não são armazenadas no navegador. A colaboração pública funciona mesmo antes de configurar a administração.
+Não há senha padrão. Para configurar o usuário `suporte`, execute `GERAR_HASH_SENHA.cmd` na pasta do projeto e copie o hash gerado para `SUPPORT_PASSWORD_HASH` no `.env`. Esse comando também localiza o Node.js disponível para o aplicativo. O hash fica somente no servidor; senhas não são armazenadas no navegador. A colaboração pública funciona mesmo antes de configurar a administração.
 
 Veja a [revisão da interface, da rede e da execução em segundo plano](docs/REVISAO_INTERFACE_E_REDE.md), com capturas e validação.
 
@@ -69,7 +75,7 @@ npm start
 
 Para desenvolver, `npm run dev` inicia interface com atualização automática e API juntas na porta 1992, com banco separado em `data/development.sqlite`. Não execute junto com a versão pronta na mesma porta. A página `/test/responsive.html` ajuda a verificar a interface em 320, 390 e 768 px. Esse arquivo de teste não entra no build de produção.
 
-O workflow executa testes, build, lint e smoke em Linux e Windows. No Windows verifica se o CMD fecha, se o servidor continua respondendo pelo IP real da LAN, se dois cliques evitam duplicação, se os dados de configuração são preservados e se `PARAR_SITE.cmd` libera a porta. Também testa instalação do zero sem Node pré-configurado e reinicialização com cache, usando uma pasta com espaços. Um registro de PID divergente deve ser recusado sem encerrar outro processo.
+O workflow executa testes, build, lint e smoke em Linux e Windows. No Windows verifica se o CMD fecha, se o servidor continua respondendo pelo IP real da LAN, se dois cliques evitam duplicação, se os dados de configuração são preservados e se `PARAR_SITE.cmd` libera a porta. Também testa a preparação do zero com Node LTS instalado, sem dependências ou build, e reinicialização com cache em uma pasta com espaços e `&`. Os testes não simulam a aprovação do instalador oficial pelo usuário. Um registro de PID divergente deve ser recusado sem encerrar outro processo.
 
 O build fica disponível nos artefatos da execução em Actions. Consulte o resultado da revisão antes de presumir aprovação.
 

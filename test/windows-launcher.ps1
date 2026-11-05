@@ -1,22 +1,18 @@
-param([Parameter(Mandatory=$true)][string]$ProjectRoot, [switch]$Portable)
+param([Parameter(Mandatory=$true)][string]$ProjectRoot, [switch]$Clean)
 $ErrorActionPreference = 'Stop'
 $ProjectRoot = (Resolve-Path -LiteralPath $ProjectRoot).Path
 $env:BASE_NO_OPEN = '1'
 $env:BASE_NO_PAUSE = '1'
-$env:PORT = if ($Portable) { '22992' } else { '21992' }
+$env:PORT = if ($Clean) { '22992' } else { '21992' }
 $env:PUBLIC_ORIGIN = 'http://localhost:' + $env:PORT
 $env:DATABASE_PATH = Join-Path $env:RUNNER_TEMP ('launcher-' + $env:PORT + '.sqlite')
-if ($Portable) {
-    $env:BASE_FORCE_PORTABLE_NODE = '1'
-    $env:BASE_RUNTIME_DIR = Join-Path $env:RUNNER_TEMP 'Runtime do usuario'
-}
 Copy-Item -LiteralPath (Join-Path $ProjectRoot '.env.example') -Destination (Join-Path $ProjectRoot '.env')
 Add-Content -LiteralPath (Join-Path $ProjectRoot '.env') -Value "`nHOST=127.0.0.1`nEXISTING_SETTING=preservar"
 $originalEnv = [IO.File]::ReadAllText((Join-Path $ProjectRoot '.env'))
 $firstStamps = @{}
 function Run-Cmd([string]$Name) {
     $process = Start-Process -FilePath 'cmd.exe' -ArgumentList '/d', '/c', $Name -WorkingDirectory $ProjectRoot -NoNewWindow -PassThru
-    if (-not $process.WaitForExit(20000)) { throw "$Name manteve a janela CMD aberta." }
+    if (-not $process.WaitForExit(180000)) { throw "$Name manteve a janela CMD aberta." }
     if ($process.ExitCode -ne 0) { throw "$Name falhou com codigo $($process.ExitCode)." }
 }
 function Read-Json([string]$Path) { return (Get-Content -LiteralPath (Join-Path $ProjectRoot $Path) -Raw | ConvertFrom-Json) }
@@ -51,8 +47,9 @@ for ($round = 1; $round -le 2; $round++) {
             elseif ($file.LastWriteTimeUtc -ne $firstStamps[$stamp]) { throw "A segunda inicializacao refez $stamp sem necessidade." }
         }
         $log = Get-Content -LiteralPath (Join-Path $ProjectRoot 'logs/site.log') -Raw
-        if ($Portable -and $round -eq 1 -and $log -notmatch 'Baixando Node.js 24') { throw 'O teste nao percorreu o download automatico do Node.' }
-        if ($round -eq 2 -and $log -match 'Baixando Node.js 24') { throw 'O Node foi baixado novamente sem necessidade.' }
+        $prepareLog = Get-Content -LiteralPath (Join-Path $ProjectRoot 'logs/preparacao.log') -Raw
+        if ($prepareLog -match 'DEP0190') { throw 'A chamada ao npm ainda usa a forma depreciada com shell.' }
+        if ($log -match 'npm ci|npm run build') { throw 'A instalacao ou o build ocorreram no processo em segundo plano.' }
         Run-Cmd 'INICIAR_SITE.cmd'
         $duplicate = Read-Json '.cache/service.json'
         if ($duplicate.pid -ne $state.pid) { throw 'Clicar duas vezes iniciou uma segunda instancia.' }
@@ -68,10 +65,10 @@ for ($round = 1; $round -le 2; $round++) {
     if (Is-Healthy) { throw 'PARAR_SITE.cmd deixou o servidor respondendo.' }
     Write-Host 'Encerramento validado: a porta foi liberada e o servidor encerrou.'
 }
-# A stale record must never authorize killing an unrelated PowerShell process.
-$unrelated = Start-Process -FilePath 'powershell.exe' -ArgumentList '-NoProfile', '-Command', 'Start-Sleep -Seconds 60' -WindowStyle Hidden -PassThru
+# A stale record must never authorize killing an unrelated process.
+$unrelated = Start-Process -FilePath (Get-Command node.exe).Source -ArgumentList '-e', '"setTimeout(()=>{},60000)"' -PassThru
 try {
-    $fake = @{pid=$unrelated.Id; startedAt='2000-01-01T00:00:00.0000000Z'; projectRoot=$ProjectRoot; script=(Join-Path $ProjectRoot 'scripts/start-windows.ps1')}
+    $fake = @{pid=$unrelated.Id; startedAt='2000-01-01T00:00:00.0000000Z'; projectRoot=$ProjectRoot; instance='registro-invalido'}
     [IO.File]::WriteAllText((Join-Path $ProjectRoot '.cache/service.json'), ($fake | ConvertTo-Json -Compress))
     $stop = Start-Process -FilePath 'cmd.exe' -ArgumentList '/d', '/c', 'PARAR_SITE.cmd' -WorkingDirectory $ProjectRoot -NoNewWindow -Wait -PassThru
     if ($stop.ExitCode -eq 0 -or $unrelated.HasExited) { throw 'A protecao de identidade do processo falhou.' }

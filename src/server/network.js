@@ -1,7 +1,11 @@
 import { networkInterfaces } from "node:os";
 import { isIPv4 } from "node:net";
 
-export function localAddresses(interfaces = networkInterfaces()) {
+export function localAddresses(interfaces) {
+  if(interfaces===undefined){
+    try{interfaces=networkInterfaces();}
+    catch(error){console.warn("[rede] Não foi possível consultar os adaptadores ("+(error.code||"sistema")+"). O servidor continua em 0.0.0.0; consulte o IP do computador no Windows.");interfaces={};}
+  }
   const addresses = [];
   for (const [name, entries] of Object.entries(interfaces)) {
     for (const item of entries || []) {

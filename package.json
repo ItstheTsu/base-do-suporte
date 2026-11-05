@@ -1,11 +1,11 @@
 {
   "name": "base-do-suporte",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "type": "module",
   "description": "Base de conhecimento colaborativa do suporte — aplicação unificada.",
   "engines": {
-    "node": ">=24.0.0 <25"
+    "node": ">=24.0.0 <25 || >=26.0.0 <27"
   },
   "scripts": {
     "start": "node --env-file-if-exists=.env src/server/server.js",

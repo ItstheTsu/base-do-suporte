@@ -75,6 +75,16 @@ const document = (slug = "novo-artigo") => ({
   status: "draft",
 });
 
+test("a origem do IP que recebeu a conexão funciona mesmo sem descoberta de adaptadores", async t => {
+  const {call}=await fixture(t,{production:true,publicOrigin:"http://localhost:1992",allowedOrigins:[]});
+  const health=await call("/health");
+  const origin=new URL(health.url).origin;
+  const response=await call("/articles",{method:"POST",origin,body:{...document("origem-do-socket"),status:"published"}});
+  assert.equal(response.status,201);
+  const denied=await call("/articles",{method:"POST",origin:"http://outro-site.test",body:{...document("origem-externa"),status:"published"}});
+  assert.equal(denied.status,403);
+});
+
 test("leitura pública, busca por corpo/acento/prefixo, filtros e paginação", async (t) => {
   const { call } = await fixture(t);
   const page = await (await call("/articles")).json();
