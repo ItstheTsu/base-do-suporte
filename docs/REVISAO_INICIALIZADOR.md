@@ -13,6 +13,7 @@ O Windows do usuário bloqueou o arquivo `base-do-suporte-main (2).zip` com o no
 | Ocorrência | Correção |
 | --- | --- |
 | `DEP0190` ao chamar npm com argumentos e shell | O Node executa `npm-cli.js` diretamente, com lista de argumentos e `shell: false`. O aviso não é suprimido. |
+| Atalhos de dependências em caminho Windows com `&` | TypeScript e Vite são chamados diretamente pelo Node, sem atalhos `.cmd` das dependências. |
 | Falha genérica na verificação de saúde | Até 90 segundos de espera, consulta direta a `127.0.0.1`, diagnóstico da resposta HTTP, código/sinal de saída e arquivos de log. |
 | Consulta de adaptadores interrompendo o início | Falha de enumeração é registrada; o servidor continua escutando em `0.0.0.0`. |
 | Acesso por IP sem adaptadores enumerados | A origem HTTP pode ser validada pelo endereço e pela porta locais do socket que recebeu a própria conexão. Origens externas continuam bloqueadas. |

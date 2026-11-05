@@ -20,7 +20,11 @@ export function npmCli() {
 }
 
 export function runNpm(args, { cwd, quiet = false } = {}) {
-  const result = spawnSync(process.execPath, [npmCli(), ...args], {
+  return runNode([npmCli(), ...args], {cwd, quiet});
+}
+
+export function runNode(args, { cwd, quiet = false } = {}) {
+  const result = spawnSync(process.execPath, args, {
     cwd, stdio: quiet ? "ignore" : "inherit", shell: false,
   });
   if (result.error) throw result.error;

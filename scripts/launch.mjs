@@ -6,7 +6,7 @@ import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { loadEnvFile } from "node:process";
 import { accessAddresses } from "../src/server/network.js";
-import { runNpm,supportedNode } from "./runtime.mjs";
+import { runNpm,runNode,supportedNode } from "./runtime.mjs";
 import { waitForHealth } from "./readiness.mjs";
 const root=fileURLToPath(new URL("../",import.meta.url));
 process.chdir(root);
@@ -54,11 +54,11 @@ try{
  const buildHash=hash(["src/client","public","index.html","vite.config.ts","tsconfig.app.json","tsconfig.node.json","package-lock.json"].map(path=>resolve(root,path)));
  const buildStamp=join(cache,"frontend.sha256");
  if(!existsSync("dist/index.html")||!stampMatches(buildStamp,buildHash)){
-  if(!npm(["run","build"]))throw new Error("O frontend não compilou. Confira o erro acima.");
+  if(!runNode(["scripts/build.mjs"],{cwd:root}))throw new Error("O frontend não compilou. Confira o erro acima.");
   writeFileSync(buildStamp,buildHash);
  }
  console.log("[3/4] Preparando o conteúdo inicial...");
- if(!npm(["run","seed"]))throw new Error("Não foi possível preparar o conteúdo.");
+ if(!runNode(["--env-file-if-exists=.env","src/server/seed.js"],{cwd:root}))throw new Error("Não foi possível preparar o conteúdo.");
  }
  if(process.argv.includes("--prepare-only")){console.log("Preparação concluída.");process.exit(0);}
  if(!existsSync("dist/index.html"))throw new Error("O site ainda não foi compilado. Execute INICIAR_SITE.cmd.");
