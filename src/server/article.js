@@ -32,10 +32,31 @@ const image = z.object({
 const procedureSection = z.object({
   id: text(1,80).regex(/^[a-zA-Z0-9_-]+$/),
   title: text(2,120),
+  kind: z.enum(["steps", "sql", "images"]).optional(),
+  sql: z.string().max(60000).optional(),
   steps: lines(50),
   images: z.array(image).max(10).default([]),
-}).strict().refine(value => value.steps.length > 0 || value.images.length > 0, "Inclua um passo ou imagem.")
-  .refine(value => value.images.every(image => !image.step || image.step <= value.steps.length), "O passo da imagem não existe.");
+}).strict().superRefine((section, ctx) => {
+  const issue = (path, message) => ctx.addIssue({ code: "custom", path: [path], message });
+  if (section.kind === "sql") {
+    if (!section.sql?.trim()) issue("sql", "Informe o código SQL.");
+  } else if (section.sql !== undefined) {
+    issue("sql", "Selecione o tipo SQL para incluir código.");
+  }
+  if (section.kind === "images" && !section.images.length) {
+    issue("images", "Adicione pelo menos uma imagem à seção.");
+  }
+  if (section.kind === "steps") {
+    if (!section.steps.length) issue("steps", "Informe pelo menos um passo.");
+  } else if (!section.kind) {
+    if (!section.steps.length && !section.images.length) issue("steps", "Inclua um passo ou imagem.");
+  } else if (section.steps.length) {
+    issue("steps", "Use o tipo Passo a passo para incluir passos.");
+  }
+  if (section.images.some(image => image.step && image.step > section.steps.length)) {
+    issue("images", "O passo da imagem não existe.");
+  }
+});
 
 export const articleSchema = z
   .object({
@@ -112,7 +133,7 @@ export function searchBody(article) {
     article.validation,
     ...article.warnings,
     article.errorMessage || "",
-    ...(article.procedureSections || []).flatMap(section => [section.title, ...section.steps, ...section.images.map(image => image.caption)]),
+    ...(article.procedureSections || []).flatMap(section => [section.title, ...section.steps, section.sql ?? "", ...section.images.map(image => image.caption)]),
   ].join("\n");
 }
 

@@ -623,6 +623,26 @@ test("seções validam vínculos dos prints e aceitam consulta e escalonamento i
  const created=await call("/articles",{method:"POST",body});assert.equal(created.status,201);
  const result=await(await call("/articles/consulta-com-secoes")).json();assert.equal(result.databaseMode,"read");assert.equal(result.requiresEscalation,true);assert.equal(result.procedureSections[0].images.length,1);
 });
+test("seções SQL preservam o código e seções de imagens exigem um print", async t => {
+  const { call } = await fixture(t);
+  const sql = "-- Consulta para conferência\nSELECT\n  'lotezebraverde' AS lote;\n";
+  const { previewUrl, ...attachment } = await (await uploadImage(call)).json();
+  const code = { id: "consulta", title: "Consulta SQL", kind: "sql", sql, steps: [], images: [] };
+  const pictures = { id: "prints", title: "Tela do sistema", kind: "images", steps: [], images: [attachment] };
+  const body = { ...document("tipos-de-secao"), status: "published", procedureSections: [code, pictures] };
+
+  for (const invalidSection of [{ ...code, sql: "  \n" }, { ...pictures, images: [] }]) {
+    const rejected = await call("/articles", { method: "POST", body: { ...body, procedureSections: [invalidSection] } });
+    assert.equal(rejected.status, 422);
+  }
+  assert.equal((await call("/articles", { method: "POST", body })).status, 201);
+  const article = await (await call("/articles/tipos-de-secao")).json();
+  assert.equal(article.procedureSections[0].sql, sql);
+  assert.equal(article.procedureSections[1].kind, "images");
+  assert.equal(article.procedureSections[1].images[0].id, attachment.id);
+  assert.equal((await (await call("/articles?q=lotezebraverde")).json()).total, 1);
+});
+
 test("a listagem pública envia somente resumos, sem o corpo dos procedimentos",async t=>{
  const {call}=await fixture(t);const page=await(await call("/articles")).json();
  for(const item of page.items){assert.ok(!("steps" in item));assert.ok(!("symptoms" in item));assert.ok(!("procedureSections" in item));assert.ok(item.summary);}

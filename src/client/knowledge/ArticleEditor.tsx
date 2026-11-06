@@ -7,6 +7,7 @@ import {
   useParams,
 } from "react-router";
 import { ApiError, errorMessage, request } from "./api";
+import { procedureKind } from "./article-sections";
 import { useSupport } from "./session-context";
 import ArticleContent from "./ArticleContent";
 import ProcedureEditor from "./ProcedureEditor";
@@ -31,7 +32,7 @@ const blank: ArticleDocument = {
   databaseMode: "none",
   requiresEscalation: false,
   errorMessage: "",
-  procedureSections: [{ id: "principal", title: "Procedimento", steps: [""], images: [] }],
+  procedureSections: [{ id: "principal", title: "Procedimento", kind: "steps", steps: [""], images: [] }],
 };
 const slugify = (value: string) =>
   value
@@ -94,7 +95,14 @@ export default function ArticleEditor() {
           deletedAt: _deleted,
           ...content
         } = article;
-        setDocument({...content,procedureSections:content.procedureSections?.length?content.procedureSections:[{id:"principal",title:"Procedimento",steps:content.steps,images:[]}],databaseMode:content.databaseMode || (content.requiresDatabaseChange?"write":"none"),requiresEscalation:content.requiresEscalation ?? Boolean(content.requiresDatabaseChange)});
+        setDocument({
+          ...content,
+          procedureSections: content.procedureSections?.length
+            ? content.procedureSections.map(section => ({ ...section, kind: procedureKind(section) }))
+            : [{ id: "principal", title: "Procedimento", kind: "steps", steps: content.steps, images: [] }],
+          databaseMode: content.databaseMode || (content.requiresDatabaseChange ? "write" : "none"),
+          requiresEscalation: content.requiresEscalation ?? Boolean(content.requiresDatabaseChange),
+        });
         setArticleId(article.id);
         setVersion(revision);
         setTags(content.tags.join(", "));
@@ -115,17 +123,35 @@ export default function ArticleEditor() {
   }
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSaving(true);
     setError("");
     setNotice("");
     setConflict(false);
+    const procedureSections = (document.procedureSections ?? []).map(section => {
+      const kind = procedureKind(section);
+      return {
+        ...section,
+        kind,
+        steps: kind === "steps" ? section.steps.map(step => step.trim()).filter(Boolean) : [],
+        sql: kind === "sql" ? section.sql : undefined,
+        images: kind === "steps" ? section.images : section.images.map(image => ({ ...image, step: undefined })),
+      };
+    });
+    const emptyImages = procedureSections.findIndex(section => section.kind === "images" && !section.images.length);
+    if (emptyImages >= 0) {
+      setError(`Adicione pelo menos uma imagem à seção ${emptyImages + 1}.`);
+      return;
+    }
+    const steps = procedureSections.length
+      ? procedureSections.flatMap(section => section.steps).slice(0, 30)
+      : document.steps.map(step => step.trim()).filter(Boolean);
+    setSaving(true);
     const submitter = (event.nativeEvent as SubmitEvent)
       .submitter as HTMLButtonElement | null;
     const content: ArticleDocument = {
       ...document,
       sources: document.sources.filter(source => source.title.trim() || source.url.trim()),
       requiresDatabaseChange:document.databaseMode==="write" || (!document.databaseMode && Boolean(document.requiresDatabaseChange)),
-      procedureSections:(document.procedureSections||[]).map(section=>({...section,steps:section.steps.map(step=>step.trim()).filter(Boolean)})),
+      procedureSections,
       status:
         !adminMode || submitter?.value === "published" ? "published" : "draft",
       tags: [
@@ -136,9 +162,7 @@ export default function ArticleEditor() {
             .filter(Boolean),
         ),
       ],
-      steps: document.procedureSections?.length
-        ? document.procedureSections.flatMap(section=>section.steps.map(step=>step.trim()).filter(Boolean)).concat(document.procedureSections.every(section=>!section.steps.some(step=>step.trim()))?["Consulte as imagens do procedimento."]:[])
-        : document.steps.map((step) => step.trim()).filter(Boolean),
+      steps: steps.length || !procedureSections.length ? steps : ["Consulte as seções do procedimento."],
       warnings: document.warnings
         .map((warning) => warning.trim())
         .filter(Boolean),

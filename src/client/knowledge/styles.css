@@ -125,6 +125,13 @@ button, a, input, select, textarea, summary { outline-offset: 4px; }
 .kb-caution h2, .kb-caution strong { color: #f2d39b; }
 .kb-article-body .kb-caution p, .kb-article-body .kb-caution li { color: #ded0b1; }
 .kb-error-message { font: 13px/1.8 ui-monospace, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; background: #261f29; border: 1px solid #635064; color: #f4c5d2; border-radius: 6px; padding: 18px; }
+.kb-sql-block { min-width: 0; max-width: 100%; border: 1px solid var(--kb-border); border-radius: 7px; background: var(--kb-input); }
+.kb-sql-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 14px; border-bottom: 1px solid var(--kb-border); }
+.kb-sql-toolbar strong { color: var(--kb-accent); font-size: 12px; }
+.kb-sql-block pre { max-height: 420px; overflow: auto; margin: 0; padding: 14px; color: #d7ebe7; }
+.kb-sql-block code, .kb-field .kb-sql-input, .kb-sql-manual textarea { font: 13px/1.7 ui-monospace, Consolas, monospace; }
+.kb-article-body .kb-sql-status { margin: 0; padding: 8px 14px; color: var(--kb-accent); font-size: 12px; }
+.kb-sql-manual { margin: 0; padding: 0 14px 14px; }
 .kb-sources { margin: 14px 0 0; }
 .kb-sources li { margin-top: 8px; }
 .kb-sources a { color: var(--kb-accent); text-decoration: underline; text-underline-offset: 3px; }

@@ -1,5 +1,13 @@
 export interface ArticleImage { id: string; url: string; caption: string; step?: number }
-export interface ProcedureSection { id: string; title: string; steps: string[]; images: ArticleImage[] }
+export type ProcedureKind = "steps" | "sql" | "images";
+export interface ProcedureSection {
+  id: string;
+  title: string;
+  kind?: ProcedureKind;
+  sql?: string;
+  steps: string[];
+  images: ArticleImage[];
+}
 export interface ArticleDocument {
   title: string;
   slug: string;

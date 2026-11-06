@@ -165,6 +165,42 @@ describe("consulta pública", () => {
 });
 
 describe("editor e conteúdo", () => {
+  it("converte passos existentes em SQL e copia o código completo da prévia", async () => {
+    const sql = "SELECT\n  'exemplo' AS lote;";
+    const oldArticle = { ...article, steps: sql.split("\n") };
+    const writeText = vi.fn(async (_code: string) => {});
+    const user = userEvent.setup();
+    vi.spyOn(navigator, "clipboard", "get").mockReturnValue({ writeText } as unknown as Clipboard);
+    let saved: Article | undefined;
+    vi.stubGlobal("fetch", vi.fn(async (_path: string, options: RequestInit) => {
+      if (options.method === "PATCH") {
+        saved = { ...oldArticle, ...JSON.parse(options.body as string), version: 2 };
+        return json(saved);
+      }
+      return json(oldArticle);
+    }));
+    render(
+      <SessionContext.Provider value={{ ...session, user: null }}>
+        <MemoryRouter initialEntries={["/artigos/conferir-lote/editar"]}>
+          <Routes><Route path="/artigos/:slug/editar" element={<ArticleEditor />} /></Routes>
+        </MemoryRouter>
+      </SessionContext.Provider>,
+    );
+    const kind = await screen.findByLabelText("Tipo da seção 1");
+    await user.selectOptions(kind, "images");
+    expect(screen.queryByLabelText("Passos da seção 1")).toBeNull();
+    expect(screen.getByLabelText("Adicionar prints à seção 1")).toBeDefined();
+    await user.selectOptions(kind, "sql");
+    expect((screen.getByLabelText(/Código SQL da seção 1/) as HTMLTextAreaElement).value).toBe(sql);
+    await user.click(screen.getByRole("button", { name: "Visualizar prévia" }));
+    await user.click(screen.getByRole("button", { name: "Copiar SQL" }));
+    expect(writeText).toHaveBeenCalledWith(sql);
+    expect(await screen.findByText("SQL copiado.")).toBeDefined();
+    await user.click(screen.getByRole("button", { name: "Salvar publicação" }));
+    await screen.findByText("Artigo publicado. A leitura pública já está disponível.");
+    expect(saved?.procedureSections?.[0]).toMatchObject({ kind: "sql", sql, steps: [] });
+  });
+
   it("permite publicar após remover a última referência ou deixar uma linha vazia", async () => {
     let saved: any;
     vi.stubGlobal("fetch", vi.fn(async (_path: string, options: RequestInit) => {
